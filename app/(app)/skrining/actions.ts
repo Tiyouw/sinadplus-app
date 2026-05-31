@@ -5,34 +5,36 @@ import { createClient } from '@/lib/supabase/server'
 import { SNAP_IV_QUESTIONS, scoreSnapIv } from '@/lib/scoring/snap-iv'
 import { DEMO_CHILD_ID } from '@/lib/supabase/queries'
 
-export async function saveScreening(formData: FormData) {
+export type ScreeningFormState = {
+  error?: string
+}
+
+export async function saveScreening(
+  _prevState: ScreeningFormState,
+  formData: FormData,
+): Promise<ScreeningFormState> {
   try {
-    // Build answers object from formData
     const answers: Record<string, number> = {}
 
     for (const question of SNAP_IV_QUESTIONS) {
       const value = formData.get(question.id)
 
       if (value === null) {
-        throw new Error(`Pertanyaan "${question.text}" belum dijawab`)
+        return { error: `Pertanyaan nomor ${SNAP_IV_QUESTIONS.indexOf(question) + 1} belum dijawab.` }
       }
 
-      const numValue = parseInt(value as string, 10)
+      const numValue = Number(value)
 
-      if (isNaN(numValue) || numValue < 0 || numValue > 3) {
-        throw new Error(`Nilai jawaban untuk "${question.text}" tidak valid`)
+      if (!Number.isInteger(numValue) || numValue < 0 || numValue > 3) {
+        return { error: 'Ada nilai jawaban yang tidak valid. Silakan periksa kembali formulir.' }
       }
 
       answers[question.id] = numValue
     }
 
-    // Score the answers
     const result = scoreSnapIv(answers)
-
-    // Get Supabase client
     const supabase = await createClient()
 
-    // Insert screening into database
     const { data, error } = await supabase
       .from('screenings')
       .insert({
@@ -48,29 +50,18 @@ export async function saveScreening(formData: FormData) {
       .select('id')
       .single()
 
-    if (error) {
-      console.error('Supabase error:', error)
-      throw new Error(`Gagal menyimpan hasil skrining: ${error.message}`)
+    if (error || !data) {
+      console.error('Supabase screening save error:', error)
+      return { error: 'Hasil skrining belum dapat disimpan. Silakan coba lagi.' }
     }
 
-    if (!data) {
-      throw new Error('Gagal menyimpan hasil skrining: tidak ada data yang dikembalikan')
-    }
-
-    // Redirect to results page
     redirect(`/hasil/${data.id}`)
   } catch (error) {
-    // If it's a redirect, let it through
     if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
       throw error
     }
 
-    // Otherwise, log and rethrow with user-friendly message
     console.error('Error saving screening:', error)
-    throw new Error(
-      error instanceof Error
-        ? error.message
-        : 'Terjadi kesalahan saat menyimpan hasil skrining. Silakan coba lagi.'
-    )
+    return { error: 'Terjadi kesalahan saat menyimpan hasil skrining. Silakan coba lagi.' }
   }
 }

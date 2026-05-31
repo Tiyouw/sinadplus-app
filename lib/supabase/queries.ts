@@ -12,7 +12,7 @@ export async function getDemoChild() {
 
   if (error) throw error
   if (!data) {
-    throw new Error('Demo child data not found')
+    throw new Error('Child not found')
   }
   return data
 }
@@ -28,9 +28,6 @@ export async function getLatestScreening(childId = DEMO_CHILD_ID) {
     .maybeSingle()
 
   if (error) throw error
-  if (!data) {
-    throw new Error('Demo child data not found')
-  }
   return data
 }
 
@@ -44,7 +41,7 @@ export async function getScreeningById(screeningId: string) {
 
   if (error) throw error
   if (!data) {
-    throw new Error('Demo child data not found')
+    throw new Error('Screening not found')
   }
   return data
 }
@@ -63,9 +60,6 @@ export async function getActivities(domain?: string) {
   const { data, error } = await query
 
   if (error) throw error
-  if (!data) {
-    throw new Error('Demo child data not found')
-  }
   return data || []
 }
 
@@ -79,7 +73,7 @@ export async function getActivityById(activityId: string) {
 
   if (error) throw error
   if (!data) {
-    throw new Error('Demo child data not found')
+    throw new Error('Activity not found')
   }
   return data
 }
@@ -93,9 +87,6 @@ export async function getBehaviorLogs(childId = DEMO_CHILD_ID) {
     .order('log_date', { ascending: false })
 
   if (error) throw error
-  if (!data) {
-    throw new Error('Demo child data not found')
-  }
   return data || []
 }
 
@@ -108,8 +99,5 @@ export async function getArticles() {
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  if (!data) {
-    throw new Error('Demo child data not found')
-  }
   return data || []
 }
