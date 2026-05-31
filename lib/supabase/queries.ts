@@ -1,5 +1,6 @@
 import { createClient } from './server'
 import { Database } from './types'
+import type { SnapIvDomain } from '@/lib/scoring/snap-iv'
 
 export const DEMO_CHILD_ID = '11111111-1111-1111-1111-111111111111'
 
@@ -47,7 +48,7 @@ export async function getScreeningById(screeningId: string): Promise<Database['p
   return data
 }
 
-export async function getActivities(domain?: string): Promise<Database['public']['Tables']['activities']['Row'][]> {
+export async function getActivities(domain?: SnapIvDomain): Promise<Database['public']['Tables']['activities']['Row'][]> {
   const supabase = await createClient()
   let query = supabase
     .from('activities')
@@ -101,4 +102,20 @@ export async function getArticles(): Promise<Database['public']['Tables']['educa
 
   if (error) throw error
   return data || []
+}
+
+export async function getArticleBySlug(slug: string): Promise<Database['public']['Tables']['education_articles']['Row']> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('education_articles')
+    .select('*')
+    .eq('slug', slug)
+    .eq('reviewer_status', 'approved')
+    .single()
+
+  if (error) throw error
+  if (!data) {
+    throw new Error('Article not found')
+  }
+  return data
 }

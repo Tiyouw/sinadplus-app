@@ -1,6 +1,6 @@
 import React from 'react'
 import { NextResponse } from 'next/server'
-import { renderToBuffer } from '@react-pdf/renderer'
+import { renderToBuffer, type DocumentProps } from '@react-pdf/renderer'
 import { buildReportData } from '@/lib/report/build-report-data'
 import { ReportPDF } from '@/lib/report/report-pdf'
 import { getActivities, getBehaviorLogs, getDemoChild, getLatestScreening } from '@/lib/supabase/queries'
@@ -35,11 +35,12 @@ export async function GET() {
       activities,
     })
 
-    const pdfBuffer = await renderToBuffer(React.createElement(ReportPDF, { data: reportData }))
+    const reportDocument = React.createElement(ReportPDF, { data: reportData }) as React.ReactElement<DocumentProps>
+    const pdfBuffer = await renderToBuffer(reportDocument)
     const date = new Date().toISOString().split('T')[0]
     const filename = `Laporan-${sanitizeFilenamePart(child.name)}-${date}.pdf`
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,

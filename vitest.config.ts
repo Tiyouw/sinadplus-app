@@ -11,7 +11,6 @@ export default defineConfig({
     include: ['lib/**/*.test.ts', 'lib/**/*.test.tsx'],
     setupFiles: [],
     pool: 'threads',
-    singleThread: true,
   },
   resolve: {
     alias: {

@@ -34,6 +34,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       screenings: {
         Row: {
@@ -43,8 +44,8 @@ export type Database = {
           inattention_score: number
           hyperactivity_impulsivity_score: number
           total_score: number
-          category: string
-          dominant_domain: string
+          category: 'rendah' | 'perlu_diperhatikan' | 'tinggi'
+          dominant_domain: 'inattention' | 'hyperactivity_impulsivity'
           answers_json: Json
           disclaimer_version: string
           created_at: string
@@ -56,8 +57,8 @@ export type Database = {
           inattention_score: number
           hyperactivity_impulsivity_score: number
           total_score: number
-          category: string
-          dominant_domain: string
+          category: 'rendah' | 'perlu_diperhatikan' | 'tinggi'
+          dominant_domain: 'inattention' | 'hyperactivity_impulsivity'
           answers_json: Json
           disclaimer_version?: string
           created_at?: string
@@ -69,18 +70,19 @@ export type Database = {
           inattention_score?: number
           hyperactivity_impulsivity_score?: number
           total_score?: number
-          category?: string
-          dominant_domain?: string
+          category?: 'rendah' | 'perlu_diperhatikan' | 'tinggi'
+          dominant_domain?: 'inattention' | 'hyperactivity_impulsivity'
           answers_json?: Json
           disclaimer_version?: string
           created_at?: string
         }
+        Relationships: []
       }
       activities: {
         Row: {
           id: string
           title: string
-          domain: string
+          domain: 'inattention' | 'hyperactivity_impulsivity'
           age_min: number
           age_max: number
           duration_minutes: number
@@ -97,7 +99,7 @@ export type Database = {
         Insert: {
           id?: string
           title: string
-          domain: string
+          domain: 'inattention' | 'hyperactivity_impulsivity'
           age_min: number
           age_max: number
           duration_minutes: number
@@ -114,7 +116,7 @@ export type Database = {
         Update: {
           id?: string
           title?: string
-          domain?: string
+          domain?: 'inattention' | 'hyperactivity_impulsivity'
           age_min?: number
           age_max?: number
           duration_minutes?: number
@@ -128,6 +130,7 @@ export type Database = {
           source_label?: string
           created_at?: string
         }
+        Relationships: []
       }
       behavior_logs: {
         Row: {
@@ -172,6 +175,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       education_articles: {
         Row: {
@@ -210,6 +214,7 @@ export type Database = {
           read_time_minutes?: number
           created_at?: string
         }
+        Relationships: []
       }
       report_snapshots: {
         Row: {
@@ -242,7 +247,12 @@ export type Database = {
           version?: string
           created_at?: string
         }
+        Relationships: []
       }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }

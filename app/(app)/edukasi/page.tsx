@@ -67,7 +67,7 @@ function EdukasiContent({ articles }: { articles: ArticlesData }) {
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
-            <div key={article.id} className="sinad-card p-6">
+            <Link key={article.id} href={`/edukasi/${article.slug}`} className="sinad-card block p-6 transition hover:-translate-y-0.5 hover:border-primary/30">
               <div className="mb-4">
                 <div className="mb-2 inline-block rounded-xl bg-indigo-100 px-3 py-1 text-xs font-medium text-indigo-700">
                   {article.category}
@@ -93,7 +93,7 @@ function EdukasiContent({ articles }: { articles: ArticlesData }) {
                   </div>
                 )}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
