@@ -4,12 +4,38 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   const response = NextResponse.next({
     request,
   })
+
+  // Protected routes
+  const protectedRoutes = [
+    '/dashboard',
+    '/anak',
+    '/skrining',
+    '/hasil',
+    '/aktivitas',
+    '/catatan',
+    '/laporan',
+    '/edukasi',
+  ]
+
+  const isProtectedRoute = protectedRoutes.some(route =>
+    pathname.startsWith(route)
+  )
+
+  // If Supabase credentials are not configured, allow public routes but block protected routes
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (isProtectedRoute) {
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/login'
+      return NextResponse.redirect(redirectUrl)
+    }
+    return response
+  }
 
   const supabase = createServerClient(
     supabaseUrl,
@@ -31,22 +57,6 @@ export async function middleware(request: NextRequest) {
 
   // Validate user JWT server-side
   const { data: { user } } = await supabase.auth.getUser()
-
-  // Protected routes
-  const protectedRoutes = [
-    '/dashboard',
-    '/anak',
-    '/skrining',
-    '/hasil',
-    '/aktivitas',
-    '/catatan',
-    '/laporan',
-    '/edukasi',
-  ]
-
-  const isProtectedRoute = protectedRoutes.some(route =>
-    pathname.startsWith(route)
-  )
 
   if (isProtectedRoute && !user) {
     const redirectUrl = request.nextUrl.clone()
