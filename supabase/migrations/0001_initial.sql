@@ -18,8 +18,8 @@ create table public.screenings (
   inattention_score integer not null,
   hyperactivity_impulsivity_score integer not null,
   total_score integer not null,
-  category text not null,
-  dominant_domain text not null,
+  category text not null check (category in ('rendah','perlu_diperhatikan','tinggi')),
+  dominant_domain text not null check (dominant_domain in ('inattention','hyperactivity_impulsivity')),
   answers_json jsonb not null,
   disclaimer_version text not null default 'v1',
   created_at timestamptz not null default now()
@@ -28,7 +28,7 @@ create table public.screenings (
 create table public.activities (
   id uuid primary key default gen_random_uuid(),
   title text not null,
-  domain text not null,
+  domain text not null check (domain in ('inattention','hyperactivity_impulsivity')),
   age_min integer not null,
   age_max integer not null,
   duration_minutes integer not null,
@@ -81,6 +81,26 @@ create table public.report_snapshots (
   version text not null default 'v1',
   created_at timestamptz not null default now()
 );
+n-- Indexes for query performance
+create index idx_children_user_id on public.children(user_id);
+create index idx_screenings_child_completed on public.screenings(child_id, completed_at desc);
+create index idx_behavior_logs_child_date on public.behavior_logs(child_id, log_date desc);
+create index idx_report_snapshots_child_generated on public.report_snapshots(child_id, generated_at desc);
+
+-- Trigger function for updated_at
+create or replace function public.update_updated_at_column()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+-- Apply updated_at triggers
+create trigger update_children_updated_at before update on public.children
+  for each row execute function public.update_updated_at_column();
+create trigger update_behavior_logs_updated_at before update on public.behavior_logs
+  for each row execute function public.update_updated_at_column();
 
 alter table public.children enable row level security;
 alter table public.screenings enable row level security;
@@ -89,6 +109,8 @@ alter table public.behavior_logs enable row level security;
 alter table public.education_articles enable row level security;
 alter table public.report_snapshots enable row level security;
 
+-- NOTE: These are intentionally permissive MVP demo policies.
+-- Must be tightened with proper auth.uid() checks before production deployment.
 create policy "demo children read" on public.children for select using (true);
 create policy "demo children insert" on public.children for insert with check (true);
 create policy "demo screenings read" on public.screenings for select using (true);
