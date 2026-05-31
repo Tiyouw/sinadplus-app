@@ -12,7 +12,7 @@ const steps = [
     title: 'Aktivitas Bermain Terstruktur',
     parent: 'Orang tua mencoba aktivitas singkat yang aman di rumah.',
     system: 'SINAD+ menghubungkan aktivitas dengan area pengamatan.',
-    boundary: 'Aktivitas bukan terapi klinis.',
+    boundary: 'Aktivitas adalah observasi rumah, bukan arahan profesional.',
     icon: Activity,
   },
   {
