@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default function DemoLoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2">
           <CardTitle className="text-2xl font-semibold">Demo SINAD+</CardTitle>
@@ -28,6 +28,6 @@ export default function DemoLoginPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </main>
   )
 }
