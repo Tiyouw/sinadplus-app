@@ -43,7 +43,7 @@ export function AppShell({ children }: AppShellProps) {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
-            aria-label="Toggle menu"
+            aria-label={mobileMenuOpen ? 'Tutup navigasi' : 'Buka navigasi'}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -82,7 +82,7 @@ export function AppShell({ children }: AppShellProps) {
           <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
             {navItems.map((item) => {
               const Icon = item.icon
-              const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
 
               return (
                 <Link
