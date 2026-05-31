@@ -1,19 +1,33 @@
 import React from 'react'
 import { NextResponse } from 'next/server'
-import { renderToStream } from '@react-pdf/renderer'
-import { getDemoChild, getLatestScreening, getBehaviorLogs, getActivities } from '@/lib/supabase/queries'
+import { renderToBuffer } from '@react-pdf/renderer'
 import { buildReportData } from '@/lib/report/build-report-data'
 import { ReportPDF } from '@/lib/report/report-pdf'
+import { getActivities, getBehaviorLogs, getDemoChild, getLatestScreening } from '@/lib/supabase/queries'
+import { createClient } from '@/lib/supabase/server'
+
+function sanitizeFilenamePart(value: string) {
+  return value
+    .normalize('NFKD')
+    .replace(/[^a-zA-Z0-9-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '') || 'anak-demo'
+}
 
 export async function GET() {
   try {
-    // Fetch all data needed for report
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const child = await getDemoChild()
     const latestScreening = await getLatestScreening(child.id)
     const logs = await getBehaviorLogs(child.id)
     const activities = await getActivities()
 
-    // Build report data
     const reportData = buildReportData({
       child,
       screenings: latestScreening ? [latestScreening] : [],
@@ -21,15 +35,11 @@ export async function GET() {
       activities,
     })
 
-    // Render PDF
-    const stream = await renderToStream(React.createElement(ReportPDF, { data: reportData }))
-
-    // Generate filename with child name and date
+    const pdfBuffer = await renderToBuffer(React.createElement(ReportPDF, { data: reportData }))
     const date = new Date().toISOString().split('T')[0]
-    const filename = `Laporan-${child.name.replace(/\s+/g, '-')}-${date}.pdf`
+    const filename = `Laporan-${sanitizeFilenamePart(child.name)}-${date}.pdf`
 
-    // Return PDF response
-    return new NextResponse(stream as unknown as ReadableStream, {
+    return new NextResponse(pdfBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,
@@ -38,8 +48,8 @@ export async function GET() {
   } catch (error) {
     console.error('Error generating report PDF:', error)
     return NextResponse.json(
-      { error: 'Failed to generate report PDF' },
-      { status: 500 }
+      { error: 'Gagal membuat laporan PDF.' },
+      { status: 500 },
     )
   }
 }
