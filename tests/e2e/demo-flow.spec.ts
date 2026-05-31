@@ -15,11 +15,11 @@ test.describe('Public Landing Page', () => {
     await expect(page.locator('text=SINAD+').first()).toBeVisible();
     
     // Verify main heading
-    await expect(page.locator('h1')).toContainText('Pendampingan Awal');
-    await expect(page.locator('h1')).toContainText('Perkembangan Anak');
-    
+    await expect(page.locator('h1')).toContainText('Ubah catatan kecil');
+    await expect(page.locator('h1')).toContainText('bekal konsultasi');
+
     // Verify CTA button exists
-    const ctaButton = page.locator('a[href="/login"]', { hasText: 'Coba Demo' }).first();
+    const ctaButton = page.locator('a[href="/login"]', { hasText: 'Masuk Demo' }).first();
     await expect(ctaButton).toBeVisible();
   });
 
@@ -31,11 +31,11 @@ test.describe('Public Landing Page', () => {
     // Verify main content is visible
     await expect(page.locator('main')).toBeVisible();
     
-    // Verify features section
-    await expect(page.locator('text=Fitur Utama')).toBeVisible();
-    await expect(page.locator('text=Skrining Awal')).toBeVisible();
-    await expect(page.locator('text=Aktivitas Terstruktur')).toBeVisible();
-    await expect(page.locator('text=Laporan Konsultasi')).toBeVisible();
+    // Verify product flow section
+    await expect(page.locator('text=Alur produk')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Skrining Awal', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Aktivitas Bermain Terstruktur' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Laporan Konsultasi', exact: true })).toBeVisible();
   });
 
   test('should be mobile-responsive', async ({ page, isMobile }) => {
@@ -47,11 +47,11 @@ test.describe('Public Landing Page', () => {
     await expect(page.locator('h1')).toBeVisible();
     
     // Verify CTA button is visible and accessible on mobile
-    const ctaButton = page.locator('a[href="/login"]', { hasText: 'Coba Demo' }).first();
+    const ctaButton = page.locator('a[href="/login"]', { hasText: 'Masuk Demo' }).first();
     await expect(ctaButton).toBeVisible();
-    
-    // Verify features section is visible
-    await expect(page.locator('text=Fitur Utama')).toBeVisible();
+
+    // Verify flow section is visible
+    await expect(page.locator('text=Alur produk')).toBeVisible();
   });
 });
 
@@ -59,8 +59,8 @@ test.describe('Demo Login Flow', () => {
   test('should navigate to demo login page and display login button', async ({ page }) => {
     await page.goto('/');
     
-    // Click on "Coba Demo" or "Masuk Demo" link
-    const demoLink = page.locator('a[href="/login"]', { hasText: 'Coba Demo' }).first();
+    // Click on "Masuk Demo" link
+    const demoLink = page.locator('a[href="/login"]', { hasText: 'Masuk Demo' }).first();
     await demoLink.click();
     
     // Wait for navigation to login page
