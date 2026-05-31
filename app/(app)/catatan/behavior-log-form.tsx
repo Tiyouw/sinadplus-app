@@ -40,7 +40,7 @@ export function BehaviorLogForm({ activities }: { activities: Array<{ id: string
 
       <div>
         <label htmlFor="log_date" className="mb-2 block text-sm font-medium text-slate-700">
-          Tanggal Observasi <span className="text-red-500">*</span>
+          Tanggal Observasi <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <input
           type="date"
@@ -71,7 +71,7 @@ export function BehaviorLogForm({ activities }: { activities: Array<{ id: string
 
       <div>
         <label htmlFor="mood" className="mb-2 block text-sm font-medium text-slate-700">
-          Suasana Hati <span className="text-red-500">*</span>
+          Suasana Hati <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <select
           id="mood"
@@ -90,7 +90,7 @@ export function BehaviorLogForm({ activities }: { activities: Array<{ id: string
 
       <div>
         <label htmlFor="focus_rating" className="mb-2 block text-sm font-medium text-slate-700">
-          Tingkat Fokus (1-5) <span className="text-red-500">*</span>
+          Tingkat Fokus (1-5) <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <input
           type="number"
@@ -106,7 +106,7 @@ export function BehaviorLogForm({ activities }: { activities: Array<{ id: string
 
       <div>
         <label htmlFor="impulsivity_rating" className="mb-2 block text-sm font-medium text-slate-700">
-          Tingkat Impulsivitas (1-5) <span className="text-red-500">*</span>
+          Tingkat Impulsivitas (1-5) <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <input
           type="number"
@@ -122,7 +122,7 @@ export function BehaviorLogForm({ activities }: { activities: Array<{ id: string
 
       <div>
         <label htmlFor="cooperation_rating" className="mb-2 block text-sm font-medium text-slate-700">
-          Tingkat Kerja Sama (1-5) <span className="text-red-500">*</span>
+          Tingkat Kerja Sama (1-5) <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <input
           type="number"
@@ -138,7 +138,7 @@ export function BehaviorLogForm({ activities }: { activities: Array<{ id: string
 
       <div>
         <label htmlFor="notes" className="mb-2 block text-sm font-medium text-slate-700">
-          Catatan Observasi <span className="text-red-500">*</span>
+          Catatan Observasi <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
         </label>
         <textarea
           id="notes"

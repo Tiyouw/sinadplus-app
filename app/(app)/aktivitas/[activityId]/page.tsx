@@ -46,7 +46,9 @@ function ActivityFallback() {
 }
 
 function ActivityContent({ activity }: { activity: ActivityData }) {
-  const steps = Array.isArray(activity.steps_json) ? activity.steps_json : []
+  const steps = Array.isArray(activity.steps_json)
+    ? activity.steps_json.filter((step): step is string => typeof step === 'string')
+    : []
 
   return (
     <div className="mx-auto max-w-4xl p-6 lg:p-8">
@@ -109,7 +111,7 @@ function ActivityContent({ activity }: { activity: ActivityData }) {
           </div>
           {steps.length > 0 ? (
             <ol className="space-y-3">
-              {steps.map((step: string, index: number) => (
+              {steps.map((step, index) => (
                 <li key={index} className="flex gap-3">
                   <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-green-100 text-sm font-semibold text-green-700">
                     {index + 1}
