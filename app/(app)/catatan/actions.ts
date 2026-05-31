@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { DEMO_CHILD_ID } from '@/lib/supabase/queries'
+import { Database } from '@/lib/supabase/types'
 
 const ALLOWED_MOODS = ['senang', 'netral', 'rewel', 'marah', 'sedih'] as const
 
@@ -54,7 +55,7 @@ export async function saveBehaviorLog(formData: FormData) {
     cooperation_rating: getRating(formData, 'cooperation_rating', 'Tingkat kerja sama'),
     notes,
     incident_text: incidentText || null,
-  })
+  } as Database['public']['Tables']['behavior_logs']['Insert'])
 
   if (error) {
     console.error('Behavior log save error:', error)

@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SINAD+
 
-## Getting Started
+SINAD+ adalah aplikasi pendamping orang tua yang dirancang untuk mendukung observasi awal terkait ADHD pada anak. Ini adalah MVP (Minimum Viable Product) yang telah dipoles dan berfungsi penuh. **SINAD+ bukan alat diagnosis medis.**
 
-First, run the development server:
+## Setup
+
+1. Salin `.env.example` ke `.env.local`:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Isi variabel environment Supabase di `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`: URL proyek Supabase Anda
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Anon key dari proyek Supabase Anda
+
+3. Jalankan migrasi dan seed database Supabase:
+   - Buka Supabase Dashboard → SQL Editor
+   - Jalankan file SQL migrasi dan seed yang ada di folder `supabase/`
+
+4. Buat user demo di Supabase Authentication yang sesuai dengan:
+   - Email: nilai dari `DEMO_EMAIL` di `.env.local`
+   - Password: nilai dari `DEMO_PASSWORD` di `.env.local`
+
+5. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+6. Jalankan development server:
+   ```bash
+   npm run dev
+   ```
+
+Aplikasi akan berjalan di [http://localhost:3000](http://localhost:3000).
+
+## Verification
+
+Jalankan perintah berikut untuk memverifikasi kode:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Linting
+npm run lint
+
+# Unit tests
+npm run test
+
+# End-to-end tests
+npm run e2e
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Push kode ke repository Git (GitHub, GitLab, atau Bitbucket)
+2. Import project di [Vercel Dashboard](https://vercel.com/new)
+3. Tambahkan environment variables berikut di Vercel project settings:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `DEMO_EMAIL`
+   - `DEMO_PASSWORD`
+4. Deploy
 
-## Learn More
+### Supabase
 
-To learn more about Next.js, take a look at the following resources:
+Pastikan Anda telah:
+- Membuat proyek Supabase
+- Menjalankan migrasi database
+- Menjalankan seed data
+- Mengaktifkan Authentication dengan Email provider
+- Membuat user demo sesuai dengan credentials di environment variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Catatan Keamanan
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**PENTING**: SINAD+ bukan alat diagnosis medis dan tidak dimaksudkan untuk menggantikan konsultasi profesional dengan dokter, psikolog, atau tenaga kesehatan mental lainnya. Aplikasi ini hanya menyediakan alat observasi untuk membantu orang tua mencatat perilaku anak mereka. Untuk diagnosis dan penanganan ADHD yang tepat, selalu konsultasikan dengan profesional kesehatan yang berkualifikasi.
 
-## Deploy on Vercel
+## Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Testing**: Jest, React Testing Library, Playwright
+- **Deployment**: Vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+[Add your license here]

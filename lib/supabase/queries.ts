@@ -1,8 +1,9 @@
 import { createClient } from './server'
+import { Database } from './types'
 
 export const DEMO_CHILD_ID = '11111111-1111-1111-1111-111111111111'
 
-export async function getDemoChild() {
+export async function getDemoChild(): Promise<Database['public']['Tables']['children']['Row']> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('children')
@@ -17,7 +18,7 @@ export async function getDemoChild() {
   return data
 }
 
-export async function getLatestScreening(childId = DEMO_CHILD_ID) {
+export async function getLatestScreening(childId = DEMO_CHILD_ID): Promise<Database['public']['Tables']['screenings']['Row'] | null> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('screenings')
@@ -31,7 +32,7 @@ export async function getLatestScreening(childId = DEMO_CHILD_ID) {
   return data
 }
 
-export async function getScreeningById(screeningId: string) {
+export async function getScreeningById(screeningId: string): Promise<Database['public']['Tables']['screenings']['Row']> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('screenings')
@@ -46,7 +47,7 @@ export async function getScreeningById(screeningId: string) {
   return data
 }
 
-export async function getActivities(domain?: string) {
+export async function getActivities(domain?: string): Promise<Database['public']['Tables']['activities']['Row'][]> {
   const supabase = await createClient()
   let query = supabase
     .from('activities')
@@ -63,7 +64,7 @@ export async function getActivities(domain?: string) {
   return data || []
 }
 
-export async function getActivityById(activityId: string) {
+export async function getActivityById(activityId: string): Promise<Database['public']['Tables']['activities']['Row']> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('activities')
@@ -78,7 +79,7 @@ export async function getActivityById(activityId: string) {
   return data
 }
 
-export async function getBehaviorLogs(childId = DEMO_CHILD_ID) {
+export async function getBehaviorLogs(childId = DEMO_CHILD_ID): Promise<Database['public']['Tables']['behavior_logs']['Row'][]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('behavior_logs')
@@ -90,7 +91,7 @@ export async function getBehaviorLogs(childId = DEMO_CHILD_ID) {
   return data || []
 }
 
-export async function getArticles() {
+export async function getArticles(): Promise<Database['public']['Tables']['education_articles']['Row'][]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('education_articles')
