@@ -81,7 +81,7 @@ create table public.report_snapshots (
   version text not null default 'v1',
   created_at timestamptz not null default now()
 );
-n-- Indexes for query performance
+-- Indexes for query performance
 create index idx_children_user_id on public.children(user_id);
 create index idx_screenings_child_completed on public.screenings(child_id, completed_at desc);
 create index idx_behavior_logs_child_date on public.behavior_logs(child_id, log_date desc);
