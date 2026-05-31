@@ -29,8 +29,8 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session
-  const { data: { session } } = await supabase.auth.getSession()
+  // Validate user JWT server-side
+  const { data: { user } } = await supabase.auth.getUser()
 
   // Protected routes
   const protectedRoutes = [
@@ -48,7 +48,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith(route)
   )
 
-  if (isProtectedRoute && !session) {
+  if (isProtectedRoute && !user) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/login'
     return NextResponse.redirect(redirectUrl)
