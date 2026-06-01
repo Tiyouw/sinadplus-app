@@ -150,6 +150,7 @@ export function ReportPDF({ data }: ReportPDFProps) {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.brandRow}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer Image does not support alt. */}
             <Image src={LOGO_PATH} style={styles.logo} />
             <View>
               <Text style={styles.title}>SINAD+</Text>
