@@ -123,7 +123,7 @@ export function AppShell({ children }: AppShellProps) {
             <form action={signOut}>
               <button
                 type="submit"
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                className="flex w-full items-center gap-3 rounded-xl border border-red-100 bg-red-50 px-3 py-2.5 text-sm font-semibold text-red-700 transition-colors hover:border-red-200 hover:bg-red-100 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500/30"
               >
                 <LogOut size={20} />
                 <span>Keluar</span>
@@ -137,8 +137,23 @@ export function AppShell({ children }: AppShellProps) {
       </aside>
 
       {/* Main content */}
-      <main className="lg:pl-64 pt-16 lg:pt-0">
-        <div className="min-h-screen">
+      <main className="pt-16 lg:pl-64 lg:pt-0">
+        <div className="hidden h-16 items-center justify-end border-b border-slate-200 bg-white/80 px-6 backdrop-blur lg:flex">
+          <Link
+            href="/anak"
+            aria-label="Profil Alya"
+            className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition hover:border-blue-200 hover:bg-blue-50"
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+              A
+            </span>
+            <span className="text-right">
+              <span className="block text-sm font-semibold text-slate-900">Alya</span>
+              <span className="block text-xs text-slate-500 group-hover:text-blue-700">Profil Anak</span>
+            </span>
+          </Link>
+        </div>
+        <div className="min-h-[calc(100vh-4rem)]">
           {children}
         </div>
       </main>

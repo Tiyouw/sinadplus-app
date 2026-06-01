@@ -123,3 +123,15 @@ test.describe('SINAD+ Branding', () => {
     await expect(page.getByRole('img', { name: 'Logo SINAD+' }).first()).toBeVisible();
   });
 });
+
+test.describe('Authenticated Shell', () => {
+  test('shows desktop profile summary and prominent logout', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+
+    await expect(page.getByRole('link', { name: /Profil Alya/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Keluar' })).toHaveClass(/text-red-700/);
+  });
+});
