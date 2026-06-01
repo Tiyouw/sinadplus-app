@@ -1,4 +1,5 @@
 import { getBehaviorLogs, getDemoChild, getLatestScreening } from '@/lib/supabase/queries'
+import { getCategoryDisplay, getDomainLabel } from '@/lib/constants/categories'
 import { AlertCircle, ArrowRight, Activity, FileText, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 
@@ -101,8 +102,19 @@ function DashboardContent({ child, latestScreening, behaviorLogs }: DashboardDat
                 <div className="text-sm text-slate-600">Total Skor</div>
               </div>
               <div className="border-t border-slate-100 pt-3">
-                <div className="mb-1 text-sm font-medium text-slate-700">
-                  Kategori: <span className="text-slate-900">{latestScreening.category}</span>
+                <div className="mb-1 flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <span>Kategori:</span>
+                  {(() => {
+                    const display = getCategoryDisplay(latestScreening.category)
+                    return (
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold animate-pop ${display.badgeClass}`}
+                      >
+                        <span className={`h-2 w-2 rounded-full ${display.dotClass}`} />
+                        {display.label}
+                      </span>
+                    )
+                  })()}
                 </div>
                 <div className="text-xs text-slate-500">
                   {new Date(latestScreening.completed_at).toLocaleDateString('id-ID', {
@@ -129,9 +141,7 @@ function DashboardContent({ child, latestScreening, behaviorLogs }: DashboardDat
             <div>
               <div className="mb-3">
                 <div className="mb-1 text-lg font-semibold text-slate-900">
-                  {latestScreening.dominant_domain === 'inattention'
-                    ? 'Inatensi'
-                    : 'Hiperaktivitas-Impulsivitas'}
+                  {getDomainLabel(latestScreening.dominant_domain)}
                 </div>
                 <div className="text-sm text-slate-600">
                   {latestScreening.dominant_domain === 'inattention'

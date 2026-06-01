@@ -10,10 +10,12 @@ import {
   FileText,
   BarChart3,
   Menu,
-  X
+  X,
+  LogOut
 } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { signOut } from '@/app/(app)/actions'
 
 interface AppShellProps {
   children: React.ReactNode
@@ -79,7 +81,7 @@ export function AppShell({ children }: AppShellProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+          <nav className="tab-enter flex-1 px-3 py-6 space-y-1 overflow-y-auto">
             {navItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
@@ -89,14 +91,24 @@ export function AppShell({ children }: AppShellProps) {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive ? 'page' : undefined}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                    'group relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
                     isActive
                       ? 'bg-blue-50 text-blue-700'
-                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 hover:translate-x-0.5'
                   )}
                 >
-                  <Icon size={20} />
+                  {isActive && (
+                    <span
+                      className="nav-active-dot absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-blue-600"
+                      aria-hidden="true"
+                    />
+                  )}
+                  <Icon
+                    size={20}
+                    className="transition-transform duration-200 group-hover:scale-110"
+                  />
                   <span>{item.label}</span>
                 </Link>
               )
@@ -104,8 +116,17 @@ export function AppShell({ children }: AppShellProps) {
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-slate-200">
-            <p className="text-xs text-slate-500 text-center">
+          <div className="space-y-3 border-t border-slate-200 p-4">
+            <form action={signOut}>
+              <button
+                type="submit"
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              >
+                <LogOut size={20} />
+                <span>Keluar</span>
+              </button>
+            </form>
+            <p className="text-center text-xs text-slate-500">
               SINAD+ MVP v1.0
             </p>
           </div>

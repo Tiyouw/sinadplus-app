@@ -1,5 +1,6 @@
 import { getScreeningById, getActivities } from '@/lib/supabase/queries'
 import { MEDICAL_DISCLAIMER } from '@/lib/constants/copy'
+import { getCategoryDisplay, getDomainLabel } from '@/lib/constants/categories'
 import { AlertCircle, TrendingUp, Activity, ArrowRight, Lightbulb } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -65,15 +66,8 @@ function ResultsContent({
   screening: Awaited<ReturnType<typeof getScreeningById>>
   activities: Awaited<ReturnType<typeof getActivities>>
 }) {
-  const categoryLabel =
-    screening.category === 'rendah'
-      ? 'Rendah'
-      : screening.category === 'perlu_diperhatikan'
-        ? 'Perlu Diperhatikan'
-        : 'Tinggi'
-
-  const domainLabel =
-    screening.dominant_domain === 'inattention' ? 'Inatensi' : 'Hiperaktivitas-Impulsivitas'
+  const categoryDisplay = getCategoryDisplay(screening.category)
+  const domainLabel = getDomainLabel(screening.dominant_domain)
 
   const suggestedActivities = activities.slice(0, 3)
 
@@ -110,9 +104,16 @@ function ResultsContent({
             <div className="text-sm text-slate-600">dari 54 maksimal</div>
           </div>
           <div className="border-t border-slate-100 pt-3">
-            <div className="text-sm font-medium text-slate-700">
-              Kategori: <span className="text-slate-900">{categoryLabel}</span>
+            <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <span>Kategori:</span>
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold animate-pop ${categoryDisplay.badgeClass}`}
+              >
+                <span className={`h-2 w-2 rounded-full ${categoryDisplay.dotClass}`} />
+                {categoryDisplay.label}
+              </span>
             </div>
+            <p className="mt-2 text-xs leading-5 text-slate-500">{categoryDisplay.description}</p>
           </div>
         </div>
 

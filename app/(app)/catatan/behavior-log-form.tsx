@@ -2,11 +2,27 @@
 
 import { saveBehaviorLog } from './actions'
 import { useState, useTransition } from 'react'
+import { RatingScale } from '@/components/ui/rating-scale'
+import { DatePicker } from '@/components/ui/date-picker'
+import { CustomSelect, type SelectOption } from '@/components/ui/custom-select'
+
+const MOOD_OPTIONS: SelectOption[] = [
+  { value: 'senang', label: 'Senang' },
+  { value: 'netral', label: 'Netral' },
+  { value: 'rewel', label: 'Rewel' },
+  { value: 'marah', label: 'Marah' },
+  { value: 'sedih', label: 'Sedih' },
+]
 
 export function BehaviorLogForm({ activities }: { activities: Array<{ id: string; title: string }> }) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+
+  const activityOptions: SelectOption[] = [
+    { value: '', label: 'Tidak terkait aktivitas tertentu' },
+    ...activities.map((activity) => ({ value: activity.id, label: activity.title })),
+  ]
 
   async function handleSubmit(formData: FormData) {
     setError(null)
@@ -38,103 +54,43 @@ export function BehaviorLogForm({ activities }: { activities: Array<{ id: string
         </div>
       )}
 
-      <div>
-        <label htmlFor="log_date" className="mb-2 block text-sm font-medium text-slate-700">
-          Tanggal Observasi <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
-        <input
-          type="date"
-          id="log_date"
-          name="log_date"
-          required
-          className="w-full rounded-xl border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-        />
-      </div>
+      <DatePicker name="log_date" label="Tanggal Observasi" required />
 
-      <div>
-        <label htmlFor="activity_id" className="mb-2 block text-sm font-medium text-slate-700">
-          Aktivitas (Opsional)
-        </label>
-        <select
-          id="activity_id"
-          name="activity_id"
-          className="w-full rounded-xl border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-        >
-          <option value="">Tidak terkait aktivitas tertentu</option>
-          {activities.map((activity) => (
-            <option key={activity.id} value={activity.id}>
-              {activity.title}
-            </option>
-          ))}
-        </select>
-      </div>
+      <CustomSelect
+        name="activity_id"
+        label="Aktivitas (Opsional)"
+        options={activityOptions}
+        placeholder="Tidak terkait aktivitas tertentu"
+      />
 
-      <div>
-        <label htmlFor="mood" className="mb-2 block text-sm font-medium text-slate-700">
-          Suasana Hati <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
-        <select
-          id="mood"
-          name="mood"
-          required
-          className="w-full rounded-xl border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-        >
-          <option value="">Pilih suasana hati</option>
-          <option value="senang">Senang</option>
-          <option value="netral">Netral</option>
-          <option value="rewel">Rewel</option>
-          <option value="marah">Marah</option>
-          <option value="sedih">Sedih</option>
-        </select>
-      </div>
+      <CustomSelect
+        name="mood"
+        label="Suasana Hati"
+        options={MOOD_OPTIONS}
+        placeholder="Pilih suasana hati"
+        required
+      />
 
-      <div>
-        <label htmlFor="focus_rating" className="mb-2 block text-sm font-medium text-slate-700">
-          Tingkat Fokus (1-5) <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
-        <input
-          type="number"
-          id="focus_rating"
-          name="focus_rating"
-          min="1"
-          max="5"
-          required
-          className="w-full rounded-xl border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-        />
-        <p className="mt-1 text-xs text-slate-500">1 = Sangat sulit fokus, 5 = Sangat fokus</p>
-      </div>
+      <RatingScale
+        name="focus_rating"
+        label="Tingkat Fokus (1-5)"
+        helper="1 = Sangat sulit fokus, 5 = Sangat fokus"
+        required
+      />
 
-      <div>
-        <label htmlFor="impulsivity_rating" className="mb-2 block text-sm font-medium text-slate-700">
-          Tingkat Impulsivitas (1-5) <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
-        <input
-          type="number"
-          id="impulsivity_rating"
-          name="impulsivity_rating"
-          min="1"
-          max="5"
-          required
-          className="w-full rounded-xl border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-        />
-        <p className="mt-1 text-xs text-slate-500">1 = Sangat impulsif, 5 = Sangat terkendali</p>
-      </div>
+      <RatingScale
+        name="impulsivity_rating"
+        label="Tingkat Impulsivitas (1-5)"
+        helper="1 = Sangat impulsif, 5 = Sangat terkendali"
+        required
+      />
 
-      <div>
-        <label htmlFor="cooperation_rating" className="mb-2 block text-sm font-medium text-slate-700">
-          Tingkat Kerja Sama (1-5) <span className="sr-only">(wajib)</span> <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
-        <input
-          type="number"
-          id="cooperation_rating"
-          name="cooperation_rating"
-          min="1"
-          max="5"
-          required
-          className="w-full rounded-xl border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-        />
-        <p className="mt-1 text-xs text-slate-500">1 = Sangat sulit bekerja sama, 5 = Sangat kooperatif</p>
-      </div>
+      <RatingScale
+        name="cooperation_rating"
+        label="Tingkat Kerja Sama (1-5)"
+        helper="1 = Sangat sulit bekerja sama, 5 = Sangat kooperatif"
+        required
+      />
 
       <div>
         <label htmlFor="notes" className="mb-2 block text-sm font-medium text-slate-700">
