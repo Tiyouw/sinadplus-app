@@ -185,3 +185,17 @@ test.describe('Catatan Page', () => {
     await expect(history).toHaveClass(/lg:overflow-y-auto/);
   });
 });
+
+test.describe('Skrining Form', () => {
+  test('moves attention to the next unanswered question after answering', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+    await page.getByRole('link', { name: 'Skrining' }).click();
+
+    await page.locator('fieldset').first().getByText('Sedikit', { exact: true }).click();
+
+    await expect(page.getByTestId('question-card-2')).toHaveClass(/border-blue-300/);
+    await expect(page.getByText('Lanjut ke pertanyaan 2')).toBeVisible();
+  });
+});

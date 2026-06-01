@@ -36,17 +36,52 @@ export function ScreeningForm() {
   const total = SNAP_IV_QUESTIONS.length
   const percent = Math.round((answeredCount / total) * 100)
 
+  function getNextUnansweredId(currentQuestionId: string, nextAnswers: Record<string, number>) {
+    const currentIndex = SNAP_IV_QUESTIONS.findIndex((question) => question.id === currentQuestionId)
+    if (currentIndex < 0) return null
+
+    const nextQuestion = SNAP_IV_QUESTIONS.slice(currentIndex + 1).find(
+      (question) => nextAnswers[question.id] === undefined,
+    )
+
+    return nextQuestion?.id ?? null
+  }
+
+  function questionIsComfortablyVisible(el: HTMLDivElement) {
+    const rect = el.getBoundingClientRect()
+    return rect.top >= 96 && rect.bottom <= window.innerHeight - 96
+  }
+
+  function focusQuestion(questionId: string) {
+    setActiveId(questionId)
+    const el = questionRefs.current[questionId]
+    if (!el) return
+
+    if (!questionIsComfortablyVisible(el)) {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.scrollTo({
+        top: el.offsetTop - 96,
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      })
+    }
+  }
+
   function handleSelect(questionId: string, value: number) {
-    setAnswers((prev) => ({ ...prev, [questionId]: value }))
+    setAnswers((prev) => {
+      const wasAlreadyAnswered = prev[questionId] !== undefined
+      const next = { ...prev, [questionId]: value }
+      const nextUnansweredId = getNextUnansweredId(questionId, next)
+
+      if (!wasAlreadyAnswered && nextUnansweredId) {
+        window.setTimeout(() => focusQuestion(nextUnansweredId), 120)
+      }
+
+      return next
+    })
   }
 
   function jumpTo(questionId: string) {
-    setActiveId(questionId)
-    const el = questionRefs.current[questionId]
-    if (el) {
-      // scrollIntoView is banned in this project (breaks container scroll).
-      window.scrollTo({ top: el.offsetTop - 100, behavior: 'smooth' })
-    }
+    focusQuestion(questionId)
   }
 
   return (
@@ -75,6 +110,7 @@ export function ScreeningForm() {
                   ref={(el) => {
                     questionRefs.current[question.id] = el
                   }}
+                  data-testid={`question-card-${index + 1}`}
                   className={`scroll-mt-24 rounded-2xl border p-4 transition-colors ${
                     activeId === question.id
                       ? 'border-blue-300 bg-blue-50/40'
@@ -133,6 +169,11 @@ export function ScreeningForm() {
                       })}
                     </div>
                   </fieldset>
+                  {activeId === question.id && selected === undefined && (
+                    <p className="mt-3 rounded-xl bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700">
+                      Lanjut ke pertanyaan {index + 1}
+                    </p>
+                  )}
                 </div>
               )
             })}
