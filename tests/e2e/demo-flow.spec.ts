@@ -156,3 +156,17 @@ test.describe('Authenticated Shell', () => {
     await expect(page.getByRole('button', { name: 'Keluar' })).toHaveClass(/text-red-700/);
   });
 });
+
+test.describe('Laporan Page', () => {
+  test('renders human-readable screening category and domain', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+    await page.getByRole('link', { name: 'Laporan' }).click();
+
+    await expect(page.getByText('Perlu Diperhatikan')).toBeVisible();
+    await expect(page.getByText('perlu_diperhatikan')).toHaveCount(0);
+    await expect(page.getByText('Domain dominan: Inatensi')).toBeVisible();
+    await expect(page.getByText('inattention')).toHaveCount(0);
+  });
+});
