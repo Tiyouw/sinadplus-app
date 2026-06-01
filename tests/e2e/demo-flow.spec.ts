@@ -170,3 +170,18 @@ test.describe('Laporan Page', () => {
     await expect(page.getByText('inattention')).toHaveCount(0);
   });
 });
+
+test.describe('Catatan Page', () => {
+  test('keeps note history in a bounded scroll region on desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+    await page.getByRole('link', { name: 'Catatan' }).click();
+
+    const history = page.getByTestId('catatan-history-scroll');
+    await expect(history).toBeVisible();
+    await expect(history).toHaveClass(/lg:max-h-\[calc\(100vh-14rem\)\]/);
+    await expect(history).toHaveClass(/lg:overflow-y-auto/);
+  });
+});
