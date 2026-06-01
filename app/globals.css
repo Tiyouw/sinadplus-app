@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+:root {
+  --background: hsl(210 40% 98%);
+  --foreground: hsl(222 47% 11%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(222 47% 11%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(222 47% 11%);
+  --primary: hsl(214 84% 56%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(205 45% 92%);
+  --secondary-foreground: hsl(215 35% 24%);
+  --muted: hsl(210 32% 94%);
+  --muted-foreground: hsl(215 16% 47%);
+  --accent: hsl(174 48% 88%);
+  --accent-foreground: hsl(180 45% 20%);
+  --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(214 32% 88%);
+  --input: hsl(214 32% 88%);
+  --ring: hsl(214 84% 56%);
+  --radius: 1rem;
+  --sinad-blue: #2563eb;
+  --sinad-blue-dark: #1e3a8a;
+  --sinad-cyan: #22d3ee;
+  --sinad-cream: #fff7ed;
+  --sinad-paper: #ffffff;
+  --sinad-slate: #0f172a;
+  --sinad-muted: #64748b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  background-image:
+    radial-gradient(circle at top left, hsl(214 84% 92% / 0.8), transparent 32rem),
+    linear-gradient(180deg, hsl(210 40% 98%), hsl(202 48% 96%));
+  background-attachment: fixed;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+
+* {
+  border-color: var(--border);
+}
+
+.sinad-card {
+  background: hsl(0 0% 100% / 0.8);
+  border: 1px solid hsl(0 0% 100% / 0.7);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 24px 80px rgba(30, 64, 175, 0.08);
+  backdrop-filter: blur(12px);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.sinad-card:hover {
+  box-shadow: 0 32px 100px rgba(30, 64, 175, 0.12);
+  transform: translateY(-2px);
+}
+
+.animate-soft-in {
+  animation: soft-in 520ms ease both;
+}
+
+@keyframes soft-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-soft-in-delay-1 { animation-delay: 100ms; }
+.animate-soft-in-delay-2 { animation-delay: 200ms; }
+.animate-soft-in-delay-3 { animation-delay: 300ms; }
+
+.landing-shell {
+  background:
+    radial-gradient(circle at 8% 10%, rgba(191, 219, 254, 0.72), transparent 28rem),
+    radial-gradient(circle at 84% 8%, rgba(204, 251, 241, 0.64), transparent 30rem),
+    linear-gradient(180deg, #f8fbff 0%, #f8fafc 48%, #fff7ed 100%);
+}
+
+.report-card-float {
+  animation: report-card-float 7s ease-in-out infinite;
+}
+
+.report-card-float-delay-1 { animation-delay: 600ms; }
+.report-card-float-delay-2 { animation-delay: 1200ms; }
+.report-card-float-delay-3 { animation-delay: 1800ms; }
+
+.report-line-draw {
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: report-line-draw 900ms cubic-bezier(0.22, 1, 0.36, 1) 500ms forwards;
+}
+
+.report-sheet-enter {
+  animation: report-sheet-enter 760ms cubic-bezier(0.22, 1, 0.36, 1) 740ms both;
+}
+
+@keyframes report-card-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
+}
+
+@keyframes report-line-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes report-sheet-enter {
+  from { opacity: 0; transform: translateY(18px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
