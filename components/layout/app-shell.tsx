@@ -16,6 +16,7 @@ import {
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { signOut } from '@/app/(app)/actions'
+import { BrandMark } from '@/components/brand/brand-mark'
 
 interface AppShellProps {
   children: React.ReactNode
@@ -39,8 +40,9 @@ export function AppShell({ children }: AppShellProps) {
       {/* Mobile header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-50">
         <div className="flex items-center justify-between h-full px-4">
-          <Link href="/dashboard" className="text-xl font-semibold text-slate-900">
-            SINAD+
+          <Link href="/dashboard" className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+            <BrandMark className="h-9 w-9 rounded-xl" priority />
+            <span>SINAD+</span>
           </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -73,10 +75,11 @@ export function AppShell({ children }: AppShellProps) {
           <div className="h-16 flex items-center px-6 border-b border-slate-200">
             <Link
               href="/dashboard"
-              className="text-xl font-semibold text-slate-900"
+              className="flex items-center gap-3 text-xl font-semibold text-slate-900"
               onClick={() => setMobileMenuOpen(false)}
             >
-              SINAD+
+              <BrandMark className="h-10 w-10 rounded-xl" priority />
+              <span>SINAD+</span>
             </Link>
           </div>
 

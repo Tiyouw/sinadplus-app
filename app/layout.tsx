@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SINAD+ - Pendampingan Awal Perkembangan Anak",
   description: "Alat bantu pendampingan perkembangan anak dengan skrining awal, aktivitas terstruktur, dan laporan konsultasi.",
+  icons: {
+    icon: '/brand/sinad-logo.svg',
+    shortcut: '/brand/sinad-logo.svg',
+    apple: '/brand/sinad-logo.svg',
+  },
 };
 
 export default function RootLayout({

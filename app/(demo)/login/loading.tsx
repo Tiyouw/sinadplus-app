@@ -1,4 +1,5 @@
 import { APP_NAME, MEDICAL_DISCLAIMER } from '@/lib/constants/copy'
+import { BrandMark } from '@/components/brand/brand-mark'
 
 export default function DemoLoginLoading() {
   return (
@@ -8,9 +9,7 @@ export default function DemoLoginLoading() {
         <div className="relative mb-8 flex h-24 w-24 items-center justify-center">
           <span className="loading-orb absolute inset-0 rounded-full bg-blue-500/20" aria-hidden="true" />
           <span className="loading-orb absolute inset-3 rounded-full bg-blue-500/30" aria-hidden="true" />
-          <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-lg font-bold text-white shadow-lg">
-            S+
-          </span>
+          <BrandMark className="relative h-14 w-14 rounded-full" priority />
         </div>
 
         <h1 className="text-xl font-semibold text-slate-900">

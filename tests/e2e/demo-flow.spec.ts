@@ -110,3 +110,16 @@ test.describe('App Form Widgets', () => {
     await expect(page.getByRole('button', { name: 'Netral' })).toBeVisible();
   });
 });
+
+test.describe('SINAD+ Branding', () => {
+  test('uses the provided logo on login and authenticated shell', async ({ page }) => {
+    await page.goto('/login');
+
+    await expect(page.getByRole('img', { name: 'Logo SINAD+' }).first()).toBeVisible();
+
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+
+    await expect(page.getByRole('img', { name: 'Logo SINAD+' }).first()).toBeVisible();
+  });
+});
