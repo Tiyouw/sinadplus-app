@@ -109,6 +109,27 @@ test.describe('App Form Widgets', () => {
 
     await expect(page.getByRole('button', { name: 'Netral' })).toBeVisible();
   });
+
+  test('date picker calendar is opaque and above following form controls', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+    await page.getByRole('link', { name: 'Catatan' }).click();
+
+    await page.getByRole('button', { name: /Juni 2026/ }).click();
+    const dialog = page.getByRole('dialog', { name: 'Pilih tanggal' });
+
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+
+    const hit = await dialog.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const target = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return target?.closest('[role="dialog"]') === element;
+    });
+
+    expect(hit).toBe(true);
+  });
 });
 
 test.describe('SINAD+ Branding', () => {

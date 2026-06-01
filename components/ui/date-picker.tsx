@@ -100,7 +100,7 @@ export function DatePicker({ name, label, required = false }: DatePickerProps) {
   const today = new Date()
 
   return (
-    <div className="animate-fade-in">
+    <div className={cn('animate-fade-in relative', open && 'z-40')}>
       <label className="mb-2 block text-sm font-medium text-slate-700">
         {label}{' '}
         {required && (
@@ -144,7 +144,7 @@ export function DatePicker({ name, label, required = false }: DatePickerProps) {
           <div
             role="dialog"
             aria-label="Pilih tanggal"
-            className="animate-scale-in absolute z-20 mt-2 w-72 origin-top rounded-2xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-900/10"
+            className="animate-scale-in absolute z-50 mt-2 w-72 origin-top rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl shadow-slate-900/20 ring-1 ring-slate-900/5"
           >
             <div className="mb-3 flex items-center justify-between">
               <button
