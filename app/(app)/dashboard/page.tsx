@@ -61,7 +61,7 @@ function DashboardContent({ child, latestScreening, behaviorLogs }: DashboardDat
   const hasScreening = latestScreening !== null
 
   return (
-    <div className="mx-auto max-w-7xl p-6 lg:p-8">
+    <div className="mx-auto max-w-7xl p-6 lg:p-8 animate-fade-in">
       <div className="mb-8">
         <p className="text-sm font-medium text-blue-700">Dashboard Orang Tua</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-900">Selamat datang kembali</h1>
