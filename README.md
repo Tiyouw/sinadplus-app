@@ -15,7 +15,9 @@ SINAD+ adalah aplikasi pendamping orang tua yang dirancang untuk mendukung obser
 
 3. Jalankan migrasi dan seed database Supabase:
    - Buka Supabase Dashboard → SQL Editor
-   - Jalankan file SQL migrasi dan seed yang ada di folder `supabase/`
+   - Jalankan `supabase/migrations/0001_initial.sql`
+   - Jalankan `supabase/seed.sql` (data demo inti)
+   - Jalankan `supabase/seed_articles.sql` (pustaka artikel edukasi lengkap)
 
 4. Buat user demo di Supabase Authentication yang sesuai dengan:
    - Email: nilai dari `DEMO_EMAIL` di `.env.local`
