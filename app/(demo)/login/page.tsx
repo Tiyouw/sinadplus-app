@@ -1,7 +1,7 @@
 import { signInDemo } from './actions'
 import { APP_NAME, MEDICAL_DISCLAIMER } from '@/lib/constants/copy'
-import { Button } from '@/components/ui/button'
 import { BrandMark } from '@/components/brand/brand-mark'
+import { DemoLoginSubmit } from './demo-login-submit'
 
 export default function DemoLoginPage() {
   return (
@@ -27,9 +27,7 @@ export default function DemoLoginPage() {
             </ul>
           </div>
 
-          <Button type="submit" className="w-full" size="lg">
-            Masuk Demo
-          </Button>
+          <DemoLoginSubmit />
         </form>
 
         {/* Medical disclaimer */}
