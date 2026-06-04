@@ -1,7 +1,7 @@
 import { getScreeningById, getActivities } from '@/lib/supabase/queries'
 import { MEDICAL_DISCLAIMER } from '@/lib/constants/copy'
 import { getCategoryDisplay, getDomainLabel } from '@/lib/constants/categories'
-import { AlertCircle, TrendingUp, Activity, ArrowRight, Lightbulb } from 'lucide-react'
+import { AlertCircle, TrendingUp, Activity, ArrowRight, Lightbulb, BookOpen, FileText, HeartHandshake, ClipboardList } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -193,10 +193,38 @@ function ResultsContent({
       <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 lg:p-8">
         <h2 className="mb-3 text-2xl font-bold text-slate-900">Langkah Selanjutnya</h2>
         <p className="mb-6 text-slate-700">
-          Hasil skrining ini dapat menjadi bahan awal untuk diskusi dengan profesional kesehatan
-          mental. Anda dapat menyiapkan laporan lengkap yang mencakup hasil skrining dan catatan
-          perilaku untuk konsultasi.
+          Hasil skrining ini adalah awal dari satu alur pendampingan. Ikuti langkah berikut secara
+          bertahap untuk memahami pola anak dan menyiapkan diskusi dengan profesional.
         </p>
+
+        <ol className="mb-6 space-y-3">
+          {[
+            { step: 'Pahami ringkasan hasil di halaman ini.', href: null, icon: TrendingUp },
+            { step: 'Baca artikel edukasi terkait perilaku anak.', href: '/edukasi', icon: BookOpen },
+            { step: 'Coba aktivitas terstruktur untuk diamati.', href: '/aktivitas', icon: Activity },
+            { step: 'Catat respons anak setelah aktivitas.', href: '/catatan', icon: ClipboardList },
+            { step: 'Siapkan laporan untuk konsultasi.', href: '/laporan', icon: FileText },
+            { step: 'Lihat cerita dan tips orang tua terkurasi.', href: '/dukungan', icon: HeartHandshake },
+          ].map((item, index) => {
+            const Icon = item.icon
+            const content = (
+              <div className="flex items-center gap-4 rounded-2xl border border-blue-200 bg-white p-4 transition-all hover:border-blue-300 hover:shadow-md">
+                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
+                  {index + 1}
+                </span>
+                <Icon aria-hidden="true" className="flex-shrink-0 text-blue-600" size={20} />
+                <span className="flex-1 text-sm font-medium text-slate-800">{item.step}</span>
+                {item.href && <ArrowRight aria-hidden="true" className="flex-shrink-0 text-blue-400" size={18} />}
+              </div>
+            )
+            return (
+              <li key={item.step}>
+                {item.href ? <Link href={item.href}>{content}</Link> : content}
+              </li>
+            )
+          })}
+        </ol>
+
         <Link
           href="/laporan"
           className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700"

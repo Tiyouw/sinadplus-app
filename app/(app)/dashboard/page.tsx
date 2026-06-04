@@ -1,6 +1,6 @@
 import { getBehaviorLogs, getDemoChild, getLatestScreening } from '@/lib/supabase/queries'
 import { getCategoryDisplay, getDomainLabel } from '@/lib/constants/categories'
-import { AlertCircle, ArrowRight, Activity, FileText, TrendingUp } from 'lucide-react'
+import { AlertCircle, ArrowRight, Activity, FileText, TrendingUp, Award, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 
 type DashboardData = Awaited<ReturnType<typeof loadDashboardData>>
@@ -183,6 +183,8 @@ function DashboardContent({ child, latestScreening, behaviorLogs }: DashboardDat
         </div>
       </div>
 
+      <ParentProgressPanel hasScreening={hasScreening} logCount={behaviorLogs.length} />
+
       <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 lg:p-8">
         <div className="max-w-3xl">
           <h2 className="mb-3 text-2xl font-bold text-slate-900">Kesiapan Konsultasi</h2>
@@ -221,6 +223,85 @@ function DashboardContent({ child, latestScreening, behaviorLogs }: DashboardDat
           edukatif dan tidak menggantikan diagnosis medis profesional. Untuk evaluasi lengkap,
           konsultasikan dengan psikolog, psikiater, atau tenaga kesehatan profesional yang berkompeten.
         </p>
+      </div>
+    </div>
+  )
+}
+
+function ParentProgressPanel({ hasScreening, logCount }: { hasScreening: boolean; logCount: number }) {
+  const planSteps = [
+    { label: 'Skrining awal sudah tersedia', complete: hasScreening },
+    { label: 'Catatan perilaku mulai terkumpul', complete: logCount >= 1 },
+    { label: 'Konsisten mencatat (minimal 3 catatan)', complete: logCount >= 3 },
+    { label: 'Artikel edukasi tersedia untuk dibaca', complete: true },
+    { label: 'Dukungan dan tips terkurasi tersedia', complete: true },
+    { label: 'Laporan konsultasi siap dibuat', complete: hasScreening },
+  ]
+  const completed = planSteps.filter((s) => s.complete).length
+  const percent = Math.round((completed / planSteps.length) * 100)
+
+  const badges = [
+    { label: 'Mulai Memantau', earned: hasScreening },
+    { label: 'Konsisten Mencatat', earned: logCount >= 3 },
+    { label: 'Siap Konsultasi', earned: hasScreening && logCount >= 3 },
+  ]
+
+  return (
+    <div className="mb-8 rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-6 lg:p-8">
+      <div className="mb-5 flex items-center gap-3">
+        <div className="rounded-2xl bg-emerald-100 p-2">
+          <Sparkles aria-hidden="true" className="text-emerald-600" size={24} />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Rencana 7 Hari Memahami Pola Anak</h2>
+          <p className="text-sm text-slate-600">
+            Progres ini menunjukkan konsistensi penggunaan aplikasi, bukan perubahan kondisi anak.
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-5">
+        <div className="mb-2 flex items-center justify-between text-sm font-medium text-slate-700">
+          <span>Progres pemakaian</span>
+          <span>{completed} dari {planSteps.length}</span>
+        </div>
+        <div className="h-3 w-full overflow-hidden rounded-full bg-white">
+          <div
+            className="h-full rounded-full bg-emerald-500 transition-all"
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="mb-6 grid grid-cols-1 gap-2 md:grid-cols-2">
+        {planSteps.map((step) => (
+          <div key={step.label} className="flex items-start gap-2">
+            <div className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full ${step.complete ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+              {step.complete && (
+                <svg aria-hidden="true" className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+            <span className={`text-sm ${step.complete ? 'text-slate-800' : 'text-slate-500'}`}>{step.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        {badges.map((badge) => (
+          <span
+            key={badge.label}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
+              badge.earned
+                ? 'bg-emerald-600 text-white'
+                : 'border border-slate-200 bg-white text-slate-400'
+            }`}
+          >
+            <Award aria-hidden="true" size={14} />
+            {badge.label}
+          </span>
+        ))}
       </div>
     </div>
   )

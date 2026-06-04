@@ -9,6 +9,8 @@ import {
   Activity,
   FileText,
   BarChart3,
+  BookOpen,
+  HeartHandshake,
   Menu,
   X,
   LogOut
@@ -28,6 +30,8 @@ const navItems = [
   { href: '/skrining', label: 'Skrining', icon: ClipboardList },
   { href: '/aktivitas', label: 'Aktivitas', icon: Activity },
   { href: '/catatan', label: 'Catatan', icon: FileText },
+  { href: '/edukasi', label: 'Edukasi', icon: BookOpen },
+  { href: '/dukungan', label: 'Dukungan', icon: HeartHandshake },
   { href: '/laporan', label: 'Laporan', icon: BarChart3 },
 ]
 
