@@ -1,7 +1,11 @@
 import React from 'react'
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+import path from 'node:path'
+import { Document, Image, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import type { ReportData } from './build-report-data'
 import { format } from 'date-fns'
+import { getCategoryDisplay, getDomainLabel } from '@/lib/constants/categories'
+
+const LOGO_PATH = path.join(process.cwd(), 'public', 'brand', 'sinad-logo.svg')
 
 const styles = StyleSheet.create({
   page: {
@@ -13,6 +17,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderBottom: '2 solid #333',
     paddingBottom: 10,
+  },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  logo: {
+    width: 36,
+    height: 36,
   },
   title: {
     fontSize: 18,
@@ -112,6 +125,13 @@ interface ReportPDFProps {
 }
 
 export function ReportPDF({ data }: ReportPDFProps) {
+  const categoryDisplay = data.latestScreening
+    ? getCategoryDisplay(data.latestScreening.category)
+    : null
+  const domainLabel = data.latestScreening
+    ? getDomainLabel(data.latestScreening.dominant_domain)
+    : null
+
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), 'dd MMMM yyyy')
@@ -129,11 +149,17 @@ export function ReportPDF({ data }: ReportPDFProps) {
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>SINAD+</Text>
-          <Text style={styles.subtitle}>{data.title}</Text>
-          <Text style={styles.subtitle}>
-            Dibuat: {formatDate(data.generatedAt)}
-          </Text>
+          <View style={styles.brandRow}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer Image does not support alt. */}
+            <Image src={LOGO_PATH} style={styles.logo} />
+            <View>
+              <Text style={styles.title}>SINAD+</Text>
+              <Text style={styles.subtitle}>{data.title}</Text>
+              <Text style={styles.subtitle}>
+                Dibuat: {formatDate(data.generatedAt)}
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* Child Information */}
@@ -178,12 +204,12 @@ export function ReportPDF({ data }: ReportPDFProps) {
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>Kategori:</Text>
-                <Text style={styles.value}>{data.latestScreening.category}</Text>
+                <Text style={styles.value}>{categoryDisplay?.label ?? data.latestScreening.category}</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>Domain Dominan:</Text>
                 <Text style={styles.value}>
-                  {data.latestScreening.dominant_domain}
+                  {domainLabel ?? data.latestScreening.dominant_domain}
                 </Text>
               </View>
             </View>

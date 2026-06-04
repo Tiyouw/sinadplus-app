@@ -1,6 +1,7 @@
 import { getScreeningById, getActivities } from '@/lib/supabase/queries'
 import { MEDICAL_DISCLAIMER } from '@/lib/constants/copy'
-import { AlertCircle, TrendingUp, Activity, ArrowRight, Lightbulb } from 'lucide-react'
+import { getCategoryDisplay, getDomainLabel } from '@/lib/constants/categories'
+import { AlertCircle, TrendingUp, Activity, ArrowRight, Lightbulb, BookOpen, FileText, HeartHandshake, ClipboardList } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -65,15 +66,8 @@ function ResultsContent({
   screening: Awaited<ReturnType<typeof getScreeningById>>
   activities: Awaited<ReturnType<typeof getActivities>>
 }) {
-  const categoryLabel =
-    screening.category === 'rendah'
-      ? 'Rendah'
-      : screening.category === 'perlu_diperhatikan'
-        ? 'Perlu Diperhatikan'
-        : 'Tinggi'
-
-  const domainLabel =
-    screening.dominant_domain === 'inattention' ? 'Inatensi' : 'Hiperaktivitas-Impulsivitas'
+  const categoryDisplay = getCategoryDisplay(screening.category)
+  const domainLabel = getDomainLabel(screening.dominant_domain)
 
   const suggestedActivities = activities.slice(0, 3)
 
@@ -110,9 +104,16 @@ function ResultsContent({
             <div className="text-sm text-slate-600">dari 54 maksimal</div>
           </div>
           <div className="border-t border-slate-100 pt-3">
-            <div className="text-sm font-medium text-slate-700">
-              Kategori: <span className="text-slate-900">{categoryLabel}</span>
+            <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <span>Kategori:</span>
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold animate-pop ${categoryDisplay.badgeClass}`}
+              >
+                <span className={`h-2 w-2 rounded-full ${categoryDisplay.dotClass}`} />
+                {categoryDisplay.label}
+              </span>
             </div>
+            <p className="mt-2 text-xs leading-5 text-slate-500">{categoryDisplay.description}</p>
           </div>
         </div>
 
@@ -192,10 +193,38 @@ function ResultsContent({
       <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 lg:p-8">
         <h2 className="mb-3 text-2xl font-bold text-slate-900">Langkah Selanjutnya</h2>
         <p className="mb-6 text-slate-700">
-          Hasil skrining ini dapat menjadi bahan awal untuk diskusi dengan profesional kesehatan
-          mental. Anda dapat menyiapkan laporan lengkap yang mencakup hasil skrining dan catatan
-          perilaku untuk konsultasi.
+          Hasil skrining ini adalah awal dari satu alur pendampingan. Ikuti langkah berikut secara
+          bertahap untuk memahami pola anak dan menyiapkan diskusi dengan profesional.
         </p>
+
+        <ol className="mb-6 space-y-3">
+          {[
+            { step: 'Pahami ringkasan hasil di halaman ini.', href: null, icon: TrendingUp },
+            { step: 'Baca artikel edukasi terkait perilaku anak.', href: '/edukasi', icon: BookOpen },
+            { step: 'Coba aktivitas terstruktur untuk diamati.', href: '/aktivitas', icon: Activity },
+            { step: 'Catat respons anak setelah aktivitas.', href: '/catatan', icon: ClipboardList },
+            { step: 'Siapkan laporan untuk konsultasi.', href: '/laporan', icon: FileText },
+            { step: 'Lihat cerita dan tips orang tua terkurasi.', href: '/dukungan', icon: HeartHandshake },
+          ].map((item, index) => {
+            const Icon = item.icon
+            const content = (
+              <div className="flex items-center gap-4 rounded-2xl border border-blue-200 bg-white p-4 transition-all hover:border-blue-300 hover:shadow-md">
+                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
+                  {index + 1}
+                </span>
+                <Icon aria-hidden="true" className="flex-shrink-0 text-blue-600" size={20} />
+                <span className="flex-1 text-sm font-medium text-slate-800">{item.step}</span>
+                {item.href && <ArrowRight aria-hidden="true" className="flex-shrink-0 text-blue-400" size={18} />}
+              </div>
+            )
+            return (
+              <li key={item.step}>
+                {item.href ? <Link href={item.href}>{content}</Link> : content}
+              </li>
+            )
+          })}
+        </ol>
+
         <Link
           href="/laporan"
           className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700"

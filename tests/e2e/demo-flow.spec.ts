@@ -58,41 +58,144 @@ test.describe('Public Landing Page', () => {
 test.describe('Demo Login Flow', () => {
   test('should navigate to demo login page and display login button', async ({ page }) => {
     await page.goto('/');
-    
+
     // Click on "Masuk Demo" link
     const demoLink = page.locator('a[href="/login"]', { hasText: 'Masuk Demo' }).first();
     await demoLink.click();
-    
+
     // Wait for navigation to login page
     await page.waitForURL('**/login');
-    
+
     // Verify we're on the demo login page
     await expect(page.locator('text=Demo SINAD+')).toBeVisible();
-    
+
     // Verify login button is visible
     const loginButton = page.locator('button[type="submit"]', { hasText: 'Masuk Demo' });
     await expect(loginButton).toBeVisible();
-    
+
     // Verify demo information is displayed
     await expect(page.locator('text=Tentang Data Demo')).toBeVisible();
   });
 
   test('should display demo information correctly', async ({ page }) => {
     await page.goto('/login');
-    
+
     // Verify demo page title
     await expect(page.locator('text=Demo SINAD+')).toBeVisible();
-    
+
     // Verify demo description
     await expect(page.locator('text=Masuk ke akun demo')).toBeVisible();
-    
+
     // Verify demo data information points
     await expect(page.locator('text=Semua data bersifat fiktif')).toBeVisible();
     await expect(page.locator('text=Data direset secara berkala')).toBeVisible();
-    
+
     // Verify submit button
     const submitButton = page.locator('button[type="submit"]');
     await expect(submitButton).toBeVisible();
     await expect(submitButton).toBeEnabled();
+  });
+});
+
+test.describe('App Form Widgets', () => {
+  test('custom select options remain clickable above rating controls', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+    await page.getByRole('link', { name: 'Catatan' }).click();
+
+    await page.getByRole('button', { name: 'Pilih suasana hati' }).click();
+    await page.getByRole('option', { name: 'Netral' }).click();
+
+    await expect(page.getByRole('button', { name: 'Netral' })).toBeVisible();
+  });
+
+  test('date picker calendar is opaque and above following form controls', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+    await page.getByRole('link', { name: 'Catatan' }).click();
+
+    await page.getByRole('button', { name: /Juni 2026/ }).click();
+    const dialog = page.getByRole('dialog', { name: 'Pilih tanggal' });
+
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+
+    const hit = await dialog.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const target = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return target?.closest('[role="dialog"]') === element;
+    });
+
+    expect(hit).toBe(true);
+  });
+});
+
+test.describe('SINAD+ Branding', () => {
+  test('uses the provided logo on login and authenticated shell', async ({ page }) => {
+    await page.goto('/login');
+
+    await expect(page.getByRole('img', { name: 'Logo SINAD+' }).first()).toBeVisible();
+
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+
+    await expect(page.getByRole('img', { name: 'Logo SINAD+' }).first()).toBeVisible();
+  });
+});
+
+test.describe('Authenticated Shell', () => {
+  test('shows desktop profile summary and prominent logout', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+
+    await expect(page.getByRole('link', { name: /Profil Alya/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Keluar' })).toHaveClass(/text-red-700/);
+  });
+});
+
+test.describe('Laporan Page', () => {
+  test('renders human-readable screening category and domain', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+    await page.getByRole('link', { name: 'Laporan' }).click();
+
+    await expect(page.getByText('Perlu Diperhatikan')).toBeVisible();
+    await expect(page.getByText('perlu_diperhatikan')).toHaveCount(0);
+    await expect(page.getByText('Domain dominan: Inatensi')).toBeVisible();
+    await expect(page.getByText('inattention')).toHaveCount(0);
+  });
+});
+
+test.describe('Catatan Page', () => {
+  test('keeps note history in a bounded scroll region on desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+    await page.getByRole('link', { name: 'Catatan' }).click();
+
+    const history = page.getByTestId('catatan-history-scroll');
+    await expect(history).toBeVisible();
+    await expect(history).toHaveClass(/lg:max-h-\[calc\(100vh-14rem\)\]/);
+    await expect(history).toHaveClass(/lg:overflow-y-auto/);
+  });
+});
+
+test.describe('Skrining Form', () => {
+  test('moves attention to the next unanswered question after answering', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Masuk Demo' }).click();
+    await page.waitForURL('**/dashboard');
+    await page.getByRole('link', { name: 'Skrining' }).click();
+
+    await page.locator('fieldset').first().getByText('Sedikit', { exact: true }).click();
+
+    await expect(page.getByTestId('question-card-2')).toHaveClass(/border-blue-300/);
+    await expect(page.getByText('Lanjut ke pertanyaan 2')).toBeVisible();
   });
 });

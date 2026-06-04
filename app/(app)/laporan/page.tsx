@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { buildReportData } from '@/lib/report/build-report-data'
+import { getCategoryDisplay, getDomainLabel } from '@/lib/constants/categories'
 import { getActivities, getBehaviorLogs, getDemoChild, getLatestScreening } from '@/lib/supabase/queries'
 
 async function loadReportData() {
@@ -98,10 +99,22 @@ export default async function LaporanPage() {
               <ScoreBox label="Hiperaktif/Impulsif" value={reportData.latestScreening.hyperactivity_impulsivity_score} />
               <ScoreBox label="Total" value={reportData.latestScreening.total_score} />
             </div>
-            <p className="mt-4 text-sm text-slate-600">
-              Kategori: <strong>{reportData.latestScreening.category}</strong> · Domain dominan:{' '}
-              <strong>{reportData.latestScreening.dominant_domain}</strong>
-            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+              <span>Kategori:</span>
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${getCategoryDisplay(reportData.latestScreening.category).badgeClass}`}
+              >
+                <span className={`h-2 w-2 rounded-full ${getCategoryDisplay(reportData.latestScreening.category).dotClass}`} />
+                {getCategoryDisplay(reportData.latestScreening.category).label}
+              </span>
+              <span className="mx-1 text-slate-300">•</span>
+              <span>
+                Domain dominan:{' '}
+                <strong className="text-slate-900">
+                  {getDomainLabel(reportData.latestScreening.dominant_domain)}
+                </strong>
+              </span>
+            </div>
           </section>
         )}
 

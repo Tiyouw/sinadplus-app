@@ -51,7 +51,7 @@ function CatatanContent({ logs, activities }: { logs: BehaviorLogsData; activiti
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div>
+        <div className="lg:sticky lg:top-24 lg:self-start">
           <h2 className="mb-4 text-xl font-semibold text-slate-900">Tambah Catatan Baru</h2>
           <div className="sinad-card p-6">
             <BehaviorLogForm activities={activities} />
@@ -59,9 +59,12 @@ function CatatanContent({ logs, activities }: { logs: BehaviorLogsData; activiti
         </div>
 
         <div>
-          <h2 className="mb-4 text-xl font-semibold text-slate-900">
+          <h2 className="mb-2 text-xl font-semibold text-slate-900">
             Riwayat Catatan ({logs.length})
           </h2>
+          <p className="mb-4 text-sm text-slate-500">
+            Catatan terbaru tampil di atas. Jika catatan semakin banyak, daftar ini dapat digulir tanpa menutup formulir.
+          </p>
 
           {logs.length === 0 ? (
             <div className="sinad-card p-8 text-center">
@@ -72,7 +75,10 @@ function CatatanContent({ logs, activities }: { logs: BehaviorLogsData; activiti
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div
+              data-testid="catatan-history-scroll"
+              className="space-y-4 pr-1 lg:max-h-[calc(100vh-14rem)] lg:overflow-y-auto lg:overscroll-contain"
+            >
               {logs.map((log) => (
                 <div key={log.id} className="sinad-card p-6">
                   <div className="mb-4 flex items-start justify-between">

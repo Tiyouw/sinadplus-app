@@ -21,6 +21,7 @@ export async function middleware(request: NextRequest) {
     '/catatan',
     '/laporan',
     '/edukasi',
+    '/dukungan',
   ]
 
   const isProtectedRoute = protectedRoutes.some(route =>
