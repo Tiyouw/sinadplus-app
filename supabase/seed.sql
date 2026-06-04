@@ -17,7 +17,17 @@ insert into public.behavior_logs (child_id, activity_id, log_date, mood, focus_r
 ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', current_date - 3, 'Aktif', 2, 3, 3, 'Butuh dua kali pengingat untuk berhenti saat aba-aba merah.', 'Sempat berlari terlalu cepat lalu diarahkan pelan-pelan.'),
 ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222221', current_date - 1, 'Kooperatif', 4, 2, 4, 'Lebih mudah kembali fokus setelah diberi instruksi pendek.', null);
 
+-- Education articles: a minimal set lives here so a single `seed.sql` run
+-- produces a working /edukasi page. The full curated set lives in
+-- supabase/seed_articles.sql (run it for the complete library).
+-- reviewer_status must be 'approved' to appear on /edukasi.
 insert into public.education_articles (title, slug, category, summary, body, source_label, reviewer_status, read_time_minutes) values
-('Memahami Skrining Awal ADHD', 'memahami-skrining-awal-adhd', 'Skrining', 'Apa arti skrining awal dan mengapa bukan diagnosis.', 'Skrining awal membantu orang tua mengenali pola perilaku yang perlu diamati. Hasil skrining perlu dikonsultasikan dengan profesional untuk evaluasi menyeluruh.', 'Sumber edukasi terbuka', 'Perlu validasi ahli', 4),
-('Membuat Catatan Perilaku yang Berguna', 'membuat-catatan-perilaku', 'Catatan Harian', 'Cara mencatat perilaku anak secara singkat dan objektif.', 'Catatan yang berguna berisi waktu, situasi, perilaku yang terlihat, dan respons orang tua. Hindari label negatif dan fokus pada kejadian yang bisa diamati.', 'Sumber edukasi pengasuhan', 'Perlu validasi ahli', 3)
-on conflict (slug) do nothing;
+('Memahami Skrining Awal ADHD', 'memahami-skrining-awal-adhd', 'Skrining', 'Apa arti skrining awal dan mengapa bukan diagnosis.', 'Skrining awal membantu orang tua mengenali pola perilaku yang perlu diamati. Hasil skrining perlu dikonsultasikan dengan profesional untuk evaluasi menyeluruh.', 'Sumber edukasi terbuka', 'approved', 4),
+('Membuat Catatan Perilaku yang Berguna', 'membuat-catatan-perilaku', 'Catatan Harian', 'Cara mencatat perilaku anak secara singkat dan objektif.', 'Catatan yang berguna berisi waktu, situasi, perilaku yang terlihat, dan respons orang tua. Hindari label negatif dan fokus pada kejadian yang bisa diamati.', 'Sumber edukasi pengasuhan', 'approved', 3)
+on conflict (slug) do update set
+  reviewer_status = excluded.reviewer_status,
+  category = excluded.category,
+  summary = excluded.summary,
+  body = excluded.body,
+  source_label = excluded.source_label,
+  read_time_minutes = excluded.read_time_minutes;
