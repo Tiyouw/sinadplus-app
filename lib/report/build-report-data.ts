@@ -1,4 +1,5 @@
 import { MEDICAL_DISCLAIMER } from '../constants/copy'
+import { buildBehaviorInsights, type BehaviorInsights } from '@/lib/insights/behavior-insights'
 import type { Database } from '../supabase/types'
 
 type Child = Database['public']['Tables']['children']['Row']
@@ -23,6 +24,7 @@ export interface ReportData {
   latestScreening: Screening | null
   logs: BehaviorLog[]
   activities: Activity[]
+  insights: BehaviorInsights
   disclaimer: string
 }
 
@@ -57,6 +59,12 @@ export function buildReportData(input: BuildReportDataInput): ReportData {
     latestScreening,
     logs,
     activities,
+    insights: buildBehaviorInsights({
+      childName: child.name,
+      screenings,
+      logs,
+      activities,
+    }),
     disclaimer: MEDICAL_DISCLAIMER,
   }
 }

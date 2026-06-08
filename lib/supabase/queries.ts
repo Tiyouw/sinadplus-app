@@ -33,6 +33,18 @@ export async function getLatestScreening(childId = DEMO_CHILD_ID): Promise<Datab
   return data
 }
 
+export async function getScreenings(childId = DEMO_CHILD_ID): Promise<Database['public']['Tables']['screenings']['Row'][]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('screenings')
+    .select('*')
+    .eq('child_id', childId)
+    .order('completed_at', { ascending: false })
+
+  if (error) throw error
+  return data || []
+}
+
 export async function getScreeningById(screeningId: string): Promise<Database['public']['Tables']['screenings']['Row']> {
   const supabase = await createClient()
   const { data, error } = await supabase

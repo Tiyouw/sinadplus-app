@@ -1,7 +1,9 @@
-import { getScreeningById, getActivities } from '@/lib/supabase/queries'
+import { getScreeningById, getActivities, getBehaviorLogs, getDemoChild } from '@/lib/supabase/queries'
 import { MEDICAL_DISCLAIMER } from '@/lib/constants/copy'
 import { getCategoryDisplay, getDomainLabel } from '@/lib/constants/categories'
-import { AlertCircle, TrendingUp, Activity, ArrowRight, Lightbulb, BookOpen, FileText, HeartHandshake, ClipboardList } from 'lucide-react'
+import { buildBehaviorInsights } from '@/lib/insights/behavior-insights'
+import { generateAiInsightSummary } from '@/lib/insights/ai-insight'
+import { AlertCircle, TrendingUp, Activity, ArrowRight, Lightbulb, BookOpen, FileText, HeartHandshake, ClipboardList, Brain, Target, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -12,8 +14,21 @@ interface PageProps {
 async function loadScreeningData(screeningId: string) {
   try {
     const screening = await getScreeningById(screeningId)
-    const activities = await getActivities(screening.dominant_domain)
-    return { screening, activities }
+    const [allActivities, behaviorLogs, child] = await Promise.all([
+      getActivities(),
+      getBehaviorLogs(screening.child_id),
+      getDemoChild(),
+    ])
+    const activities = allActivities.filter((activity) => activity.domain === screening.dominant_domain)
+    const insights = buildBehaviorInsights({
+      childName: child.name,
+      screenings: [screening],
+      logs: behaviorLogs,
+      activities: allActivities,
+    })
+    const aiInsight = await generateAiInsightSummary(insights)
+
+    return { screening, activities, insights, aiInsight }
   } catch (error) {
     console.error('Error loading screening data:', error)
     return null
@@ -62,9 +77,13 @@ function ResultsFallback() {
 function ResultsContent({
   screening,
   activities,
+  insights,
+  aiInsight,
 }: {
   screening: Awaited<ReturnType<typeof getScreeningById>>
   activities: Awaited<ReturnType<typeof getActivities>>
+  insights: NonNullable<Awaited<ReturnType<typeof loadScreeningData>>>['insights']
+  aiInsight: NonNullable<Awaited<ReturnType<typeof loadScreeningData>>>['aiInsight']
 }) {
   const categoryDisplay = getCategoryDisplay(screening.category)
   const domainLabel = getDomainLabel(screening.dominant_domain)
@@ -190,6 +209,8 @@ function ResultsContent({
         )}
       </div>
 
+      <ResultInsightPanel insights={insights} aiInsight={aiInsight} />
+
       <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 lg:p-8">
         <h2 className="mb-3 text-2xl font-bold text-slate-900">Langkah Selanjutnya</h2>
         <p className="mb-6 text-slate-700">
@@ -242,6 +263,84 @@ function ResultsContent({
         </p>
       </div>
     </div>
+  )
+}
+
+function ResultInsightPanel({
+  insights,
+  aiInsight,
+}: {
+  insights: NonNullable<Awaited<ReturnType<typeof loadScreeningData>>>['insights']
+  aiInsight: NonNullable<Awaited<ReturnType<typeof loadScreeningData>>>['aiInsight']
+}) {
+  return (
+    <section className="mb-8 rounded-3xl border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-6 lg:p-8">
+      <div className="mb-5 flex items-start gap-3">
+        <div className="rounded-2xl bg-orange-100 p-2 text-orange-700">
+          <Brain aria-hidden="true" size={24} />
+        </div>
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-orange-700">Rekomendasi adaptif</p>
+          <h2 className="mt-1 text-2xl font-bold text-slate-900">Apa langkah paling masuk akal setelah skrining?</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-700">{insights.summary}</p>
+          <div className="mt-4 rounded-2xl border border-orange-100 bg-white/80 p-4">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <Sparkles aria-hidden="true" className="text-orange-600" size={16} />
+              <p className="text-sm font-semibold text-slate-950">Narasi pendamping</p>
+              <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${aiInsight.source === 'ai' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                {aiInsight.source === 'ai' ? 'AI aktif' : 'Rule-based fallback'}
+              </span>
+            </div>
+            <p className="text-sm leading-6 text-slate-700">{aiInsight.summary ?? insights.summary}</p>
+            <p className="mt-2 text-xs leading-5 text-slate-500">{aiInsight.reason}</p>
+          </div>
+        </div>
+      </div>
+
+      {insights.recommendedActivity ? (
+        <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="rounded-2xl border border-orange-100 bg-white p-5">
+            <div className="mb-3 flex items-center gap-2">
+              <Target aria-hidden="true" className="text-orange-600" size={20} />
+              <h3 className="font-semibold text-slate-950">Aktivitas prioritas</h3>
+            </div>
+            <h4 className="text-xl font-bold text-slate-950">{insights.recommendedActivity.title}</h4>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs font-medium">
+              <span className="rounded-full bg-orange-100 px-3 py-1 text-orange-800">{insights.recommendedActivity.domainLabel}</span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">{insights.recommendedActivity.durationLabel}</span>
+            </div>
+            <p className="mt-4 text-sm leading-6 text-slate-700">{insights.recommendedActivity.objective}</p>
+            <Link
+              href={insights.recommendedActivity.href}
+              className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-orange-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700"
+            >
+              Buka aktivitas
+              <ArrowRight aria-hidden="true" size={16} />
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h3 className="mb-3 font-semibold text-slate-950">Alasan rekomendasi</h3>
+            <p className="text-sm leading-6 text-slate-700">{insights.recommendedActivity.reason}</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {insights.evaluationIndicators.map((indicator) => (
+                <div key={indicator.label} className="rounded-2xl bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-500">{indicator.label}</p>
+                  <p className="mt-1 text-lg font-bold text-slate-950">{indicator.value}</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">{indicator.helper}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <p className="rounded-2xl bg-white p-4 text-sm text-slate-700">Tambahkan data aktivitas agar sistem dapat menyusun rekomendasi berikutnya.</p>
+      )}
+
+      <p className="mt-4 rounded-2xl bg-white/75 p-3 text-xs leading-5 text-slate-600">
+        <strong>Transparansi:</strong> {insights.safetyNote}
+      </p>
+    </section>
   )
 }
 

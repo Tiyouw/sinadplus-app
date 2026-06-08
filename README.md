@@ -13,6 +13,14 @@ SINAD+ adalah aplikasi pendamping orang tua yang dirancang untuk mendukung obser
    - `NEXT_PUBLIC_SUPABASE_URL`: URL proyek Supabase Anda
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Anon key dari proyek Supabase Anda
 
+   Opsional, untuk mengaktifkan narasi insight berbasis AI sungguhan:
+   - `SINAD_AI_API_KEY`: API key provider AI OpenAI-compatible
+   - `SINAD_AI_BASE_URL`: base URL provider, contoh `https://api.openai.com/v1`
+   - `SINAD_AI_MODEL`: nama model, contoh `gpt-4o-mini`
+
+   Jika variabel AI tidak diisi, SINAD+ tetap berjalan dengan Behavioral Insight Engine rule-based.
+   Jika respons AI gagal atau melanggar batas aman medis, aplikasi otomatis kembali ke narasi rule-based.
+
 3. Jalankan migrasi dan seed database Supabase:
    - Buka Supabase Dashboard → SQL Editor
    - Jalankan `supabase/migrations/0001_initial.sql`
@@ -61,6 +69,7 @@ npm run e2e
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `DEMO_EMAIL`
    - `DEMO_PASSWORD`
+   - Opsional: `SINAD_AI_API_KEY`, `SINAD_AI_BASE_URL`, `SINAD_AI_MODEL`
 4. Deploy
 
 ### Supabase

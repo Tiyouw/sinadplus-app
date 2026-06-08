@@ -1,4 +1,5 @@
 import { FinalCta } from '@/components/landing/final-cta'
+import { InnovationSection } from '@/components/landing/innovation-section'
 import { LandingHero } from '@/components/landing/landing-hero'
 import { ProblemSection } from '@/components/landing/problem-section'
 import { ReportPreviewSection } from '@/components/landing/report-preview'
@@ -15,6 +16,7 @@ export default function LandingPage() {
         <LandingHero />
         <ProblemSection />
         <SolutionFlow />
+        <InnovationSection />
         <ReportPreviewSection />
         <SafetySection />
         <FinalCta />

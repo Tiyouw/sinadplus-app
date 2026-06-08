@@ -109,6 +109,17 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#555',
   },
+  insightBox: {
+    padding: 10,
+    backgroundColor: '#eef2ff',
+    borderRadius: 5,
+    marginBottom: 8,
+  },
+  insightText: {
+    fontSize: 9,
+    color: '#374151',
+    lineHeight: 1.4,
+  },
   footer: {
     position: 'absolute',
     bottom: 30,
@@ -215,6 +226,30 @@ export function ReportPDF({ data }: ReportPDFProps) {
             </View>
           </View>
         )}
+
+        {/* Behavioral Insights */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Insight dan Indikator Terukur</Text>
+          <View style={styles.insightBox}>
+            <Text style={styles.activityTitle}>{data.insights.headline}</Text>
+            <Text style={styles.insightText}>{data.insights.summary}</Text>
+            <Text style={styles.insightText}>
+              Kesiapan konsultasi: {data.insights.readiness.status} ({data.insights.readiness.percent}%)
+            </Text>
+          </View>
+          {data.insights.evaluationIndicators.map((indicator) => (
+            <View key={indicator.label} style={styles.row}>
+              <Text style={styles.label}>{indicator.label}:</Text>
+              <Text style={styles.value}>{indicator.value} - {indicator.helper}</Text>
+            </View>
+          ))}
+          {data.insights.recommendedActivity && (
+            <View style={styles.insightBox}>
+              <Text style={styles.activityTitle}>Rekomendasi aktivitas: {data.insights.recommendedActivity.title}</Text>
+              <Text style={styles.insightText}>{data.insights.recommendedActivity.reason}</Text>
+            </View>
+          )}
+        </View>
 
         {/* Behavior Logs */}
         {data.logs.length > 0 && (
