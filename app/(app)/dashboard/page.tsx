@@ -1,18 +1,30 @@
-import { getBehaviorLogs, getDemoChild, getLatestScreening } from '@/lib/supabase/queries'
+import { getActivities, getBehaviorLogs, getDemoChild, getScreenings } from '@/lib/supabase/queries'
 import { getCategoryDisplay, getDomainLabel } from '@/lib/constants/categories'
-import { AlertCircle, ArrowRight, Activity, FileText, TrendingUp, Award, Sparkles } from 'lucide-react'
+import { buildBehaviorInsights } from '@/lib/insights/behavior-insights'
+import { generateAiInsightSummary } from '@/lib/insights/ai-insight'
+import { AlertCircle, ArrowRight, Activity, FileText, TrendingUp, Award, Sparkles, Brain, CheckCircle2, Target } from 'lucide-react'
 import Link from 'next/link'
 
 type DashboardData = Awaited<ReturnType<typeof loadDashboardData>>
 
 async function loadDashboardData() {
   const child = await getDemoChild()
-  const [latestScreening, behaviorLogs] = await Promise.all([
-    getLatestScreening(child.id),
+  const [screenings, behaviorLogs, activities] = await Promise.all([
+    getScreenings(child.id),
     getBehaviorLogs(child.id),
+    getActivities(),
   ])
+  const latestScreening = screenings[0] ?? null
+  const insights = buildBehaviorInsights({
+    childName: child.name,
+    screenings,
+    logs: behaviorLogs,
+    activities,
+  })
 
-  return { child, latestScreening, behaviorLogs }
+  const aiInsight = await generateAiInsightSummary(insights)
+
+  return { child, latestScreening, behaviorLogs, activities, screenings, insights, aiInsight }
 }
 
 function DashboardFallback() {
@@ -57,7 +69,7 @@ function DashboardFallback() {
   )
 }
 
-function DashboardContent({ child, latestScreening, behaviorLogs }: DashboardData) {
+function DashboardContent({ child, latestScreening, behaviorLogs, insights, aiInsight }: DashboardData) {
   const hasScreening = latestScreening !== null
 
   return (
@@ -183,6 +195,8 @@ function DashboardContent({ child, latestScreening, behaviorLogs }: DashboardDat
         </div>
       </div>
 
+      <AdaptiveInsightPanel insights={insights} aiInsight={aiInsight} />
+
       <ParentProgressPanel hasScreening={hasScreening} logCount={behaviorLogs.length} />
 
       <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 lg:p-8">
@@ -224,6 +238,140 @@ function DashboardContent({ child, latestScreening, behaviorLogs }: DashboardDat
           konsultasikan dengan psikolog, psikiater, atau tenaga kesehatan profesional yang berkompeten.
         </p>
       </div>
+    </div>
+  )
+}
+
+function AdaptiveInsightPanel({
+  insights,
+  aiInsight,
+}: {
+  insights: DashboardData['insights']
+  aiInsight: DashboardData['aiInsight']
+}) {
+  return (
+    <section className="mb-8 overflow-hidden rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-orange-50 p-6 shadow-sm lg:p-8">
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="max-w-3xl">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-indigo-700">
+            <Brain aria-hidden="true" size={14} />
+            Insight adaptif berbasis observasi
+          </div>
+          <h2 className="text-2xl font-bold text-slate-950 lg:text-3xl">{insights.headline}</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700 lg:text-base lg:leading-7">{insights.summary}</p>
+          <div className="mt-4 rounded-2xl border border-indigo-100 bg-white/85 p-4">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <Sparkles aria-hidden="true" className="text-indigo-600" size={16} />
+              <p className="text-sm font-semibold text-slate-950">Narasi pendamping</p>
+              <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${aiInsight.source === 'ai' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                {aiInsight.source === 'ai' ? 'AI aktif' : 'Rule-based fallback'}
+              </span>
+            </div>
+            <p className="text-sm leading-6 text-slate-700">{aiInsight.summary ?? insights.summary}</p>
+            <p className="mt-2 text-xs leading-5 text-slate-500">{aiInsight.reason}</p>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-white bg-white/80 p-4 shadow-sm lg:w-64">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Kesiapan konsultasi</p>
+          <div className="mt-2 flex items-end gap-2">
+            <span className="text-3xl font-bold text-slate-950">{insights.readiness.percent}%</span>
+            <span className="pb-1 text-sm font-semibold text-indigo-700">{insights.readiness.status}</span>
+          </div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+            <div className="h-full rounded-full bg-indigo-600" style={{ width: `${insights.readiness.percent}%` }} />
+          </div>
+          <p className="mt-3 text-xs leading-5 text-slate-600">{insights.readiness.description}</p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {insights.metrics.slice(0, 4).map((metric) => (
+              <InsightMetricCard key={`${metric.label}-${metric.value}`} metric={metric} />
+            ))}
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white/85 p-5">
+            <div className="mb-4 flex items-center gap-2">
+              <Target aria-hidden="true" className="text-orange-600" size={20} />
+              <h3 className="font-semibold text-slate-950">Indikator evaluasi yang bisa ditunjukkan ke juri</h3>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {insights.evaluationIndicators.map((indicator) => (
+                <div key={indicator.label} className="rounded-2xl bg-slate-50 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{indicator.label}</p>
+                  <p className="mt-2 text-xl font-bold text-slate-950">{indicator.value}</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">{indicator.helper}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {insights.recommendedActivity && (
+            <div className="rounded-2xl border border-orange-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-orange-700">Rekomendasi aktivitas berikutnya</p>
+              <h3 className="mt-2 text-xl font-bold text-slate-950">{insights.recommendedActivity.title}</h3>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-medium">
+                <span className="rounded-full bg-orange-100 px-3 py-1 text-orange-800">{insights.recommendedActivity.domainLabel}</span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">{insights.recommendedActivity.durationLabel}</span>
+              </div>
+              <p className="mt-4 text-sm leading-6 text-slate-700">{insights.recommendedActivity.reason}</p>
+              <p className="mt-3 rounded-2xl bg-orange-50 p-3 text-xs leading-5 text-orange-900">{insights.recommendedActivity.objective}</p>
+              <Link
+                href={insights.recommendedActivity.href}
+                className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-700"
+              >
+                Coba aktivitas ini
+                <ArrowRight aria-hidden="true" size={16} />
+              </Link>
+            </div>
+          )}
+
+          <div className="rounded-2xl border border-indigo-100 bg-white/85 p-5">
+            <h3 className="mb-3 font-semibold text-slate-950">Checklist data konsultasi</h3>
+            <div className="space-y-3">
+              {insights.readiness.criteria.map((criterion) => (
+                <div key={criterion.label} className="flex gap-3">
+                  <CheckCircle2
+                    aria-hidden="true"
+                    className={criterion.complete ? 'mt-0.5 text-emerald-600' : 'mt-0.5 text-slate-300'}
+                    size={18}
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">{criterion.label}</p>
+                    <p className="text-xs leading-5 text-slate-600">{criterion.helper}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p className="mt-5 rounded-2xl bg-white/70 p-3 text-xs leading-5 text-slate-600">
+        <strong>Transparansi:</strong> {insights.safetyNote}
+      </p>
+    </section>
+  )
+}
+
+function InsightMetricCard({ metric }: { metric: DashboardData['insights']['metrics'][number] }) {
+  const toneClasses = {
+    blue: 'border-blue-100 bg-blue-50 text-blue-700',
+    emerald: 'border-emerald-100 bg-emerald-50 text-emerald-700',
+    amber: 'border-amber-100 bg-amber-50 text-amber-700',
+    purple: 'border-purple-100 bg-purple-50 text-purple-700',
+    slate: 'border-slate-100 bg-slate-50 text-slate-700',
+  }[metric.tone]
+
+  return (
+    <div className={`rounded-2xl border p-4 ${toneClasses}`}>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-80">{metric.label}</p>
+      <p className="mt-2 text-2xl font-bold text-slate-950">{metric.value}</p>
+      <p className="mt-1 text-xs leading-5 text-slate-600">{metric.helper}</p>
     </div>
   )
 }

@@ -2,19 +2,19 @@ import { format } from 'date-fns'
 import Link from 'next/link'
 import { buildReportData } from '@/lib/report/build-report-data'
 import { getCategoryDisplay, getDomainLabel } from '@/lib/constants/categories'
-import { getActivities, getBehaviorLogs, getDemoChild, getLatestScreening } from '@/lib/supabase/queries'
+import { getActivities, getBehaviorLogs, getDemoChild, getScreenings } from '@/lib/supabase/queries'
 
 async function loadReportData() {
   const child = await getDemoChild()
-  const [latestScreening, logs, activities] = await Promise.all([
-    getLatestScreening(child.id),
+  const [screenings, logs, activities] = await Promise.all([
+    getScreenings(child.id),
     getBehaviorLogs(child.id),
     getActivities(),
   ])
 
   return buildReportData({
     child,
-    screenings: latestScreening ? [latestScreening] : [],
+    screenings,
     logs,
     activities,
   })
@@ -124,6 +124,30 @@ export default async function LaporanPage() {
             Laporan PDF akan menyertakan {Math.min(5, reportData.logs.length)} catatan perilaku
             terbaru dan {Math.min(3, reportData.activities.length)} aktivitas yang relevan.
           </p>
+        </section>
+
+        <section className="rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-6">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-indigo-700">Insight dan indikator terukur</p>
+          <h2 className="mt-2 text-xl font-semibold text-slate-950">{reportData.insights.headline}</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">{reportData.insights.summary}</p>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {reportData.insights.evaluationIndicators.map((indicator) => (
+              <div key={indicator.label} className="rounded-2xl bg-white p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{indicator.label}</p>
+                <p className="mt-2 text-2xl font-bold text-slate-950">{indicator.value}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-600">{indicator.helper}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 rounded-2xl border border-indigo-100 bg-white p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-950">Kesiapan konsultasi: {reportData.insights.readiness.status}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-600">{reportData.insights.readiness.description}</p>
+              </div>
+              <span className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-bold text-white">{reportData.insights.readiness.percent}%</span>
+            </div>
+          </div>
         </section>
 
         <section className="rounded-3xl border border-amber-200 bg-amber-50 p-6">

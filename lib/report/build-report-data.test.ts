@@ -27,8 +27,8 @@ describe('buildReportData', () => {
     inattention_score: 12,
     hyperactivity_impulsivity_score: 8,
     total_score: 20,
-    category: 'Indikasi Sedang',
-    dominant_domain: 'Inatensi',
+    category: 'perlu_diperhatikan',
+    dominant_domain: 'inattention',
     answers_json: {},
     disclaimer_version: '1.0',
     created_at: '2024-05-01T10:00:00Z',
@@ -41,8 +41,8 @@ describe('buildReportData', () => {
     inattention_score: 10,
     hyperactivity_impulsivity_score: 6,
     total_score: 16,
-    category: 'Indikasi Ringan',
-    dominant_domain: 'Inatensi',
+    category: 'rendah',
+    dominant_domain: 'inattention',
     answers_json: {},
     disclaimer_version: '1.0',
     created_at: '2024-06-01T10:00:00Z',
@@ -66,7 +66,7 @@ describe('buildReportData', () => {
   const mockActivity: Activity = {
     id: 'activity-1',
     title: 'Permainan Konsentrasi',
-    domain: 'inatensi',
+    domain: 'inattention',
     age_min: 6,
     age_max: 12,
     duration_minutes: 15,
@@ -162,7 +162,23 @@ describe('buildReportData', () => {
     expect(result).toHaveProperty('latestScreening')
     expect(result).toHaveProperty('logs')
     expect(result).toHaveProperty('activities')
+    expect(result).toHaveProperty('insights')
     expect(result).toHaveProperty('disclaimer')
+  })
+
+  it('should include behavior insights for measurable consultation preparation', () => {
+    const result = buildReportData({
+      child: mockChild,
+      screenings: [mockScreening1, mockScreening2],
+      logs: [mockLog],
+      activities: [mockActivity],
+      generatedAt: '2024-06-15T12:00:00Z',
+    })
+
+    expect(result.insights.headline).toContain('Inatensi')
+    expect(result.insights.evaluationIndicators).toHaveLength(3)
+    expect(result.insights.readiness.criteria.length).toBeGreaterThan(0)
+    expect(result.insights.safetyNote).toContain('rule-based')
   })
 
   it('should include child birth date and gender', () => {
