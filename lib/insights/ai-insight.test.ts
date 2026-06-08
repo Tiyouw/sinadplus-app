@@ -80,6 +80,30 @@ describe('AI insight generation', () => {
     expect(result.summary).toContain('catatan orang tua')
   })
 
+  it('explains provider quota or billing failures instead of showing a generic fallback', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      json: async () => ({
+        error: {
+          code: 'insufficient_quota',
+          type: 'insufficient_quota',
+          message: 'You exceeded your current quota.',
+        },
+      }),
+    }))
+
+    const result = await generateAiInsightSummary(sampleInsights, {
+      apiKey: 'test-key',
+      baseUrl: 'https://example.test/v1',
+      model: 'demo-model',
+    })
+
+    expect(result.source).toBe('rule_based')
+    expect(result.summary).toBeNull()
+    expect(result.reason).toContain('kuota atau billing')
+  })
+
   it('rejects unsafe AI responses and falls back', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
