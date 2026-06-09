@@ -20,6 +20,14 @@ interface ChatCompletionResponse {
   }>
 }
 
+interface ProviderErrorResponse {
+  error?: {
+    code?: string | null
+    type?: string | null
+    message?: string
+  }
+}
+
 const MAX_AI_SUMMARY_LENGTH = 520
 const AI_REQUEST_TIMEOUT_MS = 3500
 
@@ -45,6 +53,29 @@ function cleanAiSummary(content: string) {
 
 function violatesSafetyRules(content: string) {
   return /\b(mendiagnosis|diagnosis pasti|sembuh|menyembuhkan|terapi klinis|obat|dosis|jaminan|pasti membaik)\b/i.test(content)
+}
+
+function buildProviderErrorReason(status: number, errorPayload: ProviderErrorResponse | null) {
+  const code = errorPayload?.error?.code
+  const type = errorPayload?.error?.type
+
+  if (status === 401) {
+    return 'Narasi AI tidak aktif karena API key provider tidak valid atau belum diterima. Periksa kembali environment variable di Vercel.'
+  }
+
+  if (status === 403) {
+    return 'Narasi AI tidak aktif karena API key belum punya akses ke model/provider yang dipilih.'
+  }
+
+  if (status === 404) {
+    return 'Narasi AI tidak aktif karena model atau base URL provider AI tidak ditemukan.'
+  }
+
+  if (status === 429 || code === 'insufficient_quota' || type === 'insufficient_quota') {
+    return 'Narasi AI tidak aktif karena kuota atau billing provider AI belum tersedia. SINAD+ memakai narasi rule-based sampai quota diperbaiki.'
+  }
+
+  return 'Narasi AI tidak tersedia sementara, sehingga SINAD+ memakai narasi rule-based.'
 }
 
 export function buildAiInsightPrompt(insights: BehaviorInsights) {
@@ -116,10 +147,12 @@ export async function generateAiInsightSummary(
     clearTimeout(timeout)
 
     if (!response.ok) {
+      const errorPayload = await response.json().catch(() => null) as ProviderErrorResponse | null
+
       return {
         summary: null,
         source: 'rule_based',
-        reason: 'Narasi AI tidak tersedia sementara, sehingga SINAD+ memakai narasi rule-based.',
+        reason: buildProviderErrorReason(response.status, errorPayload),
       }
     }
 
