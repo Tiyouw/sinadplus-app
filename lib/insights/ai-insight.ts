@@ -71,22 +71,22 @@ function buildProviderErrorReason(status: number, errorPayload: ProviderErrorRes
   const type = errorPayload?.error?.type
 
   if (status === 401) {
-    return 'Narasi AI tidak aktif karena API key provider tidak valid atau belum diterima. Periksa kembali environment variable di Vercel.'
+    return 'Narasi pendamping belum aktif karena konfigurasi provider belum valid.'
   }
 
   if (status === 403) {
-    return 'Narasi AI tidak aktif karena API key belum punya akses ke model/provider yang dipilih.'
+    return 'Narasi pendamping belum aktif karena provider belum memberi akses ke model yang dipilih.'
   }
 
   if (status === 404) {
-    return 'Narasi AI tidak aktif karena model atau base URL provider AI tidak ditemukan.'
+    return 'Narasi pendamping belum aktif karena model atau alamat provider tidak ditemukan.'
   }
 
   if (status === 429 || code === 'insufficient_quota' || type === 'insufficient_quota') {
-    return 'Narasi AI tidak aktif karena kuota atau billing provider AI belum tersedia. SINAD+ memakai narasi rule-based sampai quota diperbaiki.'
+    return 'Narasi pendamping belum aktif karena kuota atau billing provider belum tersedia. SINAD+ memakai ringkasan observasi sampai konfigurasi diperbaiki.'
   }
 
-  return 'Narasi AI tidak tersedia sementara, sehingga SINAD+ memakai narasi rule-based.'
+  return 'Narasi pendamping belum tersedia sementara, sehingga SINAD+ memakai ringkasan observasi.'
 }
 
 export function buildAiInsightPrompt(insights: BehaviorInsights) {
@@ -116,7 +116,7 @@ export async function generateAiInsightSummary(
     return {
       summary: null,
       source: 'rule_based',
-      reason: 'Narasi AI belum aktif pada demo ini, sehingga SINAD+ memakai narasi rule-based yang tetap dapat dijelaskan.',
+      reason: 'Narasi pendamping belum aktif pada demo ini, sehingga SINAD+ memakai ringkasan observasi yang tetap dapat dijelaskan.',
     }
   }
 
@@ -124,7 +124,7 @@ export async function generateAiInsightSummary(
     return {
       summary: null,
       source: 'rule_based',
-      reason: 'Narasi AI belum lengkap dikonfigurasi, sehingga SINAD+ memakai narasi rule-based yang aman.',
+      reason: 'Narasi pendamping belum lengkap dikonfigurasi, sehingga SINAD+ memakai ringkasan observasi yang aman.',
     }
   }
 
@@ -175,7 +175,7 @@ export async function generateAiInsightSummary(
       return {
         summary: null,
         source: 'rule_based',
-        reason: 'Narasi AI kosong, sehingga SINAD+ memakai narasi rule-based.',
+        reason: 'Narasi pendamping belum tersedia, sehingga SINAD+ memakai ringkasan observasi.',
       }
     }
 
@@ -183,14 +183,14 @@ export async function generateAiInsightSummary(
       return {
         summary: null,
         source: 'rule_based',
-        reason: 'Narasi AI tidak dipakai karena tidak memenuhi batas aman medis; SINAD+ kembali ke narasi rule-based.',
+        reason: 'Narasi pendamping tidak dipakai karena tidak memenuhi batas aman medis; SINAD+ kembali ke ringkasan observasi.',
       }
     }
 
     return {
       summary: content,
       source: 'ai',
-      reason: 'AI insight dibuat dari OpenAI-compatible chat completion yang dikonfigurasi.',
+      reason: 'Narasi pendamping disusun dari data observasi yang tersedia.',
     }
   } catch (error) {
     const errorName = error instanceof Error ? error.name : ''
@@ -199,14 +199,14 @@ export async function generateAiInsightSummary(
       return {
         summary: null,
         source: 'rule_based',
-        reason: 'Narasi AI melewati batas waktu provider, sehingga SINAD+ memakai narasi rule-based.',
+        reason: 'Narasi pendamping melewati batas waktu, sehingga SINAD+ memakai ringkasan observasi.',
       }
     }
 
     return {
       summary: null,
       source: 'rule_based',
-      reason: 'Narasi AI gagal dimuat, sehingga SINAD+ memakai narasi rule-based.',
+      reason: 'Narasi pendamping gagal dimuat, sehingga SINAD+ memakai ringkasan observasi.',
     }
   }
 }

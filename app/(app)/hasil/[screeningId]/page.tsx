@@ -288,11 +288,13 @@ function ResultInsightPanel({
               <Sparkles aria-hidden="true" className="text-orange-600" size={16} />
               <p className="text-sm font-semibold text-slate-950">Narasi pendamping</p>
               <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${aiInsight.source === 'ai' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                {aiInsight.source === 'ai' ? 'AI aktif' : 'Rule-based fallback'}
+                {aiInsight.source === 'ai' ? 'Narasi adaptif' : 'Ringkasan observasi'}
               </span>
             </div>
             <p className="text-sm leading-6 text-slate-700">{aiInsight.summary ?? insights.summary}</p>
-            <p className="mt-2 text-xs leading-5 text-slate-500">{aiInsight.reason}</p>
+            <p className="mt-2 text-xs leading-5 text-slate-500">
+              Disusun dari data observasi yang tersedia dan tetap bersifat pendampingan, bukan diagnosis.
+            </p>
           </div>
         </div>
       </div>

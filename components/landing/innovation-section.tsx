@@ -12,8 +12,8 @@ const capabilities = [
     icon: Brain,
   },
   {
-    title: 'AI opsional dengan pagar medis',
-    description: 'Jika API AI dikonfigurasi, narasi pendamping dibuat model bahasa; jika tidak aman atau gagal, sistem otomatis kembali ke rule-based insight.',
+    title: 'Narasi pendamping yang aman',
+    description: 'Ringkasan disusun dengan bahasa yang mudah dipahami orang tua, tetap non-diagnostik, dan selalu menjaga batas aman medis.',
     icon: Sparkles,
   },
   {
@@ -37,13 +37,13 @@ export function InnovationSection() {
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">
               <Sparkles aria-hidden="true" size={14} />
-              Innovation layer
+              Lapisan insight
             </p>
             <h2 className="mt-5 text-4xl font-semibold tracking-tight md:text-5xl">
-              Dari data mentah menjadi insight yang bisa dipertanggungjawabkan.
+              Dari data harian menjadi arahan pendampingan yang lebih jelas.
             </h2>
             <p className="mt-5 text-base leading-8 text-blue-100">
-              Perbaikan utama SINAD+ adalah <strong className="text-white">Behavioral Insight Engine</strong>: lapisan rekomendasi yang menjembatani kebutuhan orang tua, bukti observasi, dan batas aman medis.
+              SINAD+ membantu menghubungkan kebutuhan orang tua, bukti observasi di rumah, dan batas aman medis agar langkah berikutnya lebih terarah.
             </p>
 
             <div className="mt-8 rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
@@ -51,7 +51,7 @@ export function InnovationSection() {
                 <div className="rounded-2xl bg-emerald-400/15 p-2 text-emerald-200">
                   <ShieldCheck aria-hidden="true" size={22} />
                 </div>
-                <h3 className="font-semibold text-white">Safety guard yang terlihat oleh juri</h3>
+                <h3 className="font-semibold text-white">Batas aman medis yang jelas</h3>
               </div>
               <div className="space-y-3">
                 {safeguards.map((item) => (

@@ -264,11 +264,13 @@ function AdaptiveInsightPanel({
               <Sparkles aria-hidden="true" className="text-indigo-600" size={16} />
               <p className="text-sm font-semibold text-slate-950">Narasi pendamping</p>
               <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${aiInsight.source === 'ai' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                {aiInsight.source === 'ai' ? 'AI aktif' : 'Rule-based fallback'}
+                {aiInsight.source === 'ai' ? 'Narasi adaptif' : 'Ringkasan observasi'}
               </span>
             </div>
             <p className="text-sm leading-6 text-slate-700">{aiInsight.summary ?? insights.summary}</p>
-            <p className="mt-2 text-xs leading-5 text-slate-500">{aiInsight.reason}</p>
+            <p className="mt-2 text-xs leading-5 text-slate-500">
+              Disusun dari data observasi yang tersedia dan tetap bersifat pendampingan, bukan diagnosis.
+            </p>
           </div>
         </div>
         <div className="rounded-2xl border border-white bg-white/80 p-4 shadow-sm lg:w-64">
@@ -295,7 +297,7 @@ function AdaptiveInsightPanel({
           <div className="rounded-2xl border border-slate-200 bg-white/85 p-5">
             <div className="mb-4 flex items-center gap-2">
               <Target aria-hidden="true" className="text-orange-600" size={20} />
-              <h3 className="font-semibold text-slate-950">Indikator evaluasi yang bisa ditunjukkan ke juri</h3>
+              <h3 className="font-semibold text-slate-950">Indikator observasi pendampingan</h3>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
               {insights.evaluationIndicators.map((indicator) => (
