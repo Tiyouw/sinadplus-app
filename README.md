@@ -17,6 +17,16 @@ SINAD+ adalah aplikasi pendamping orang tua yang dirancang untuk mendukung obser
    - `SINAD_AI_API_KEY`: API key provider AI OpenAI-compatible
    - `SINAD_AI_BASE_URL`: base URL provider, contoh `https://api.openai.com/v1`
    - `SINAD_AI_MODEL`: nama model, contoh `gpt-4o-mini`
+   - `SINAD_AI_MAX_TOKENS`: batas token output, default `768` agar provider reasoning seperti MiMo tidak menghasilkan output kosong
+   - `SINAD_AI_TIMEOUT_MS`: batas waktu request, default `18000`
+
+   Contoh MiMo:
+   ```env
+   SINAD_AI_BASE_URL=https://api.xiaomimimo.com/v1
+   SINAD_AI_MODEL=mimo-v2.5-pro
+   SINAD_AI_MAX_TOKENS=768
+   SINAD_AI_TIMEOUT_MS=18000
+   ```
 
    Jika variabel AI tidak diisi, SINAD+ tetap berjalan dengan Behavioral Insight Engine rule-based.
    Jika respons AI gagal atau melanggar batas aman medis, aplikasi otomatis kembali ke narasi rule-based.
@@ -69,7 +79,7 @@ npm run e2e
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `DEMO_EMAIL`
    - `DEMO_PASSWORD`
-   - Opsional: `SINAD_AI_API_KEY`, `SINAD_AI_BASE_URL`, `SINAD_AI_MODEL`
+   - Opsional: `SINAD_AI_API_KEY`, `SINAD_AI_BASE_URL`, `SINAD_AI_MODEL`, `SINAD_AI_MAX_TOKENS`, `SINAD_AI_TIMEOUT_MS`
 4. Deploy
 
 ### Supabase

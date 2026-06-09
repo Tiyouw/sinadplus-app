@@ -4,6 +4,8 @@ export interface AiInsightConfig {
   apiKey?: string
   baseUrl?: string
   model?: string
+  maxTokens?: number
+  timeoutMs?: number
 }
 
 export interface AiInsightResult {
@@ -29,13 +31,22 @@ interface ProviderErrorResponse {
 }
 
 const MAX_AI_SUMMARY_LENGTH = 520
-const AI_REQUEST_TIMEOUT_MS = 3500
+const DEFAULT_AI_MAX_TOKENS = 768
+const DEFAULT_AI_REQUEST_TIMEOUT_MS = 18_000
+
+function parsePositiveInteger(value: string | undefined, fallback: number) {
+  const parsed = Number(value)
+
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback
+}
 
 export function getAiInsightConfig(): AiInsightConfig {
   return {
     apiKey: process.env.SINAD_AI_API_KEY || process.env.OPENAI_API_KEY,
     baseUrl: process.env.SINAD_AI_BASE_URL || process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
     model: process.env.SINAD_AI_MODEL || process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    maxTokens: parsePositiveInteger(process.env.SINAD_AI_MAX_TOKENS, DEFAULT_AI_MAX_TOKENS),
+    timeoutMs: parsePositiveInteger(process.env.SINAD_AI_TIMEOUT_MS, DEFAULT_AI_REQUEST_TIMEOUT_MS),
   }
 }
 
@@ -119,7 +130,7 @@ export async function generateAiInsightSummary(
 
   try {
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT_MS)
+    const timeout = setTimeout(() => controller.abort(), config.timeoutMs ?? DEFAULT_AI_REQUEST_TIMEOUT_MS)
 
     const response = await fetch(`${trimTrailingSlash(config.baseUrl)}/chat/completions`, {
       method: 'POST',
@@ -127,15 +138,16 @@ export async function generateAiInsightSummary(
       headers: {
         Authorization: `Bearer ${config.apiKey}`,
         'Content-Type': 'application/json',
+        'User-Agent': 'SINADPlus/1.0 (+https://sinadplus.tiyoouw.app)',
       },
       body: JSON.stringify({
         model: config.model,
         temperature: 0.2,
-        max_tokens: 180,
+        max_tokens: config.maxTokens ?? DEFAULT_AI_MAX_TOKENS,
         messages: [
           {
             role: 'system',
-            content: 'Kamu menulis insight pendampingan non-diagnostik untuk aplikasi orang tua. Patuhi batasan keselamatan medis.',
+            content: 'Kamu menulis insight pendampingan non-diagnostik untuk aplikasi orang tua. Patuhi batasan keselamatan medis. Jawab final singkat dalam Bahasa Indonesia.',
           },
           {
             role: 'user',
@@ -180,7 +192,17 @@ export async function generateAiInsightSummary(
       source: 'ai',
       reason: 'AI insight dibuat dari OpenAI-compatible chat completion yang dikonfigurasi.',
     }
-  } catch {
+  } catch (error) {
+    const errorName = error instanceof Error ? error.name : ''
+
+    if (errorName === 'AbortError') {
+      return {
+        summary: null,
+        source: 'rule_based',
+        reason: 'Narasi AI melewati batas waktu provider, sehingga SINAD+ memakai narasi rule-based.',
+      }
+    }
+
     return {
       summary: null,
       source: 'rule_based',
