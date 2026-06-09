@@ -56,8 +56,8 @@ describe('AI insight generation', () => {
     expect(prompt).toContain('Misi Fokus Berikutnya')
   })
 
-  it('accepts a safe OpenAI-compatible response', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+  it('accepts a safe OpenAI-compatible response with a reasoning-model friendly token budget', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         choices: [
@@ -68,6 +68,37 @@ describe('AI insight generation', () => {
           },
         ],
       }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await generateAiInsightSummary(sampleInsights, {
+      apiKey: 'test-key',
+      baseUrl: 'https://example.test/v1',
+      model: 'demo-model',
+    })
+
+    const requestInit = fetchMock.mock.calls[0][1]
+    const requestBody = JSON.parse(String(requestInit?.body))
+
+    expect(result.source).toBe('ai')
+    expect(result.summary).toContain('catatan orang tua')
+    expect(requestBody.max_tokens).toBe(768)
+    expect(requestInit?.headers).toMatchObject({
+      'User-Agent': expect.stringContaining('SINADPlus'),
+    })
+  })
+
+  it('explains provider quota or billing failures instead of showing a generic fallback', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      json: async () => ({
+        error: {
+          code: 'insufficient_quota',
+          type: 'insufficient_quota',
+          message: 'You exceeded your current quota.',
+        },
+      }),
     }))
 
     const result = await generateAiInsightSummary(sampleInsights, {
@@ -76,8 +107,9 @@ describe('AI insight generation', () => {
       model: 'demo-model',
     })
 
-    expect(result.source).toBe('ai')
-    expect(result.summary).toContain('catatan orang tua')
+    expect(result.source).toBe('rule_based')
+    expect(result.summary).toBeNull()
+    expect(result.reason).toContain('kuota atau billing')
   })
 
   it('explains provider quota or billing failures instead of showing a generic fallback', async () => {
